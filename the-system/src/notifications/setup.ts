@@ -21,7 +21,7 @@ export function configureNotificationHandler(): void {
 async function ensureChannel(): Promise<void> {
   if (Platform.OS !== 'android') return;
   await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
-    name: 'System Mandates',
+    name: 'Задания Системы',
     importance: Notifications.AndroidImportance.MAX,
     lightColor: ACCENT,
     lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,

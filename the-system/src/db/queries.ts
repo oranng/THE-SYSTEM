@@ -352,11 +352,11 @@ const IMPORT_TABLES: { key: keyof ExportBundle; table: string }[] = [
 
 /** Sanity-check a parsed export before wiping anything. */
 export function validateImport(data: unknown): { ok: boolean; error?: string } {
-  if (!data || typeof data !== 'object') return { ok: false, error: 'Not a valid export file.' };
+  if (!data || typeof data !== 'object') return { ok: false, error: 'Это не файл экспорта СИСТЕМЫ.' };
   const d = data as ExportBundle;
-  if (!Array.isArray(d.hero) || d.hero.length === 0) return { ok: false, error: 'Missing hero record.' };
-  if (!Array.isArray(d.disciplines)) return { ok: false, error: 'Missing disciplines.' };
-  if (!Array.isArray(d.logs)) return { ok: false, error: 'Missing logs.' };
+  if (!Array.isArray(d.hero) || d.hero.length === 0) return { ok: false, error: 'В файле нет данных героя.' };
+  if (!Array.isArray(d.disciplines)) return { ok: false, error: 'В файле нет испытаний.' };
+  if (!Array.isArray(d.logs)) return { ok: false, error: 'В файле нет истории.' };
   return { ok: true };
 }
 

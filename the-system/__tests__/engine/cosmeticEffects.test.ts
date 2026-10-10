@@ -16,17 +16,17 @@ describe('applyCosmeticTheme', () => {
   });
 
   it('overrides background colour for an equipped background', () => {
-    const t = applyCosmeticTheme(base, [cos({ type: 'background', name: 'Ocean Depths', equipped: 1 })]);
-    expect(t.background).toBe(BACKGROUND_COLORS['Ocean Depths']);
+    const t = applyCosmeticTheme(base, [cos({ type: 'background', name: 'Глубины океана', equipped: 1 })]);
+    expect(t.background).toBe(BACKGROUND_COLORS['Глубины океана']);
   });
 
   it('overrides aura colour for an equipped aura', () => {
-    const t = applyCosmeticTheme(base, [cos({ type: 'aura', name: 'Frost Aura', equipped: 1 })]);
-    expect(t.auraColor).toBe(AURA_COLORS['Frost Aura']);
+    const t = applyCosmeticTheme(base, [cos({ type: 'aura', name: 'Морозная аура', equipped: 1 })]);
+    expect(t.auraColor).toBe(AURA_COLORS['Морозная аура']);
   });
 
   it('ignores unequipped cosmetics', () => {
-    const t = applyCosmeticTheme(base, [cos({ type: 'aura', name: 'Frost Aura', equipped: 0 })]);
+    const t = applyCosmeticTheme(base, [cos({ type: 'aura', name: 'Морозная аура', equipped: 0 })]);
     expect(t.auraColor).toBe(base.auraColor);
   });
 });

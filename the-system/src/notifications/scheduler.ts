@@ -6,13 +6,16 @@ import type { Rank, HeroClass } from '../types';
 // Short flavor lines appended after the undone-trials count. Sentence case;
 // {streak}/{day} are filled from the live context.
 const FLAVORS: string[] = [
-  'The System is watching.',
-  'Day {day}. Claim it.',
-  'Streak {streak} — hold the line.',
-  'The forge does not wait.',
-  'Discipline now, or regret later.',
-  'No one is coming. Good — that power is yours.',
-  'Rank up the habits and the title follows.',
+  'Система наблюдает.',
+  'День {day}. Забери его.',
+  'Серия {streak} — держи строй.',
+  'Кузня не ждёт.',
+  'Дисциплина сейчас или сожаление потом.',
+  'Никто не придёт спасать. Отлично — вся сила у тебя.',
+  'Прокачай привычки — и титул придёт сам.',
+  'ACE ждёт свой коммит.',
+  'Тело строится сегодня, а не с понедельника.',
+  'Сделай 5 минут. Дальше пойдёт само.',
 ];
 
 interface NotificationContext {
@@ -48,15 +51,14 @@ function fillTemplate(message: string, ctx: NotificationContext): string {
 
 /** "{undone} of {total} trials still undone. {flavor}" */
 function progressMessage(undone: number, total: number, ctx: NotificationContext): string {
-  const noun = undone === 1 ? 'trial' : 'trials';
   const flavor = fillTemplate(pickRandom(FLAVORS), ctx);
-  return `${undone} of ${total} ${noun} still undone. ${flavor}`;
+  return `Не выполнено ${undone} из ${total}. ${flavor}`;
 }
 
 /** Message for slots on a future day — no logs yet, so every trial is open. */
 function futureDayMessage(total: number, ctx: NotificationContext): string {
   const flavor = fillTemplate(pickRandom(FLAVORS), ctx);
-  return `${total} trials await — a new day under the System. ${flavor}`;
+  return `Ждут испытания: ${total}. Новый день под надзором Системы. ${flavor}`;
 }
 
 export async function scheduleNotifications(
@@ -105,11 +107,11 @@ export async function scheduleNotifications(
 
     if (RichNotification.available) {
       // Native: large round avatar + action buttons.
-      await RichNotification.schedule(id++, 'THE SYSTEM', message, slot.getTime(), banner);
+      await RichNotification.schedule(id++, 'СИСТЕМА', message, slot.getTime(), banner);
     } else {
       await Notifications.scheduleNotificationAsync({
         content: {
-          title: 'THE SYSTEM',
+          title: 'СИСТЕМА',
           body: message,
           color: '#D97757',
           categoryIdentifier: CATEGORY_ID,

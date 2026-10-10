@@ -31,6 +31,6 @@ export function getXpForLevel(level: number): number | null {
 }
 
 export const RANK_TITLES: Record<Rank, string> = {
-  E: 'The Awakened', D: 'The Tested', C: 'The Disciplined',
-  B: 'The Forged', A: 'The Sovereign', S: 'The Transcendent',
+  E: 'Пробуждение', D: 'Испытание', C: 'Дисциплина',
+  B: 'Закалка', A: 'Владычество', S: 'Превосхождение',
 };

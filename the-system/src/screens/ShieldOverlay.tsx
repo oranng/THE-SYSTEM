@@ -96,12 +96,12 @@ export default function ShieldOverlay() {
     <View style={styles.overlay}>
       <View style={[styles.container, { backgroundColor: theme.background, borderColor: DANGER }]}>
         <CornerBrackets color={DANGER} />
-        <Text style={[styles.title, { color: DANGER }]}>Shield Protocol</Text>
+        <Text style={[styles.title, { color: DANGER }]}>Протокол Щита</Text>
 
         {phase === 'select' && (
           <>
             <Text style={[styles.body, { color: theme.text }]}>
-              Enter the digital fortress. Leave the app before the timer ends and the fortress is breached.
+              Войди в цифровую крепость. Если выйти из приложения до конца таймера, крепость падёт.
             </Text>
             <View style={styles.durationRow}>
               {DURATIONS.map((d) => (
@@ -118,16 +118,16 @@ export default function ShieldOverlay() {
                 >
                   <CornerBrackets color={minutes === d ? theme.accent : theme.textSecondary} />
                   <Text style={[styles.durationText, { color: minutes === d ? theme.accent : theme.textSecondary }]}>
-                    {d}m
+                    {d} мин
                   </Text>
                 </TouchableOpacity>
               ))}
             </View>
             <TouchableOpacity style={[styles.lockBtn, { backgroundColor: DANGER }]} onPress={start}>
-              <Text style={styles.lockBtnText}>Engage fortress</Text>
+              <Text style={styles.lockBtnText}>Поднять крепость</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.cancelBtn} onPress={close}>
-              <Text style={[styles.cancelText, { color: theme.textSecondary }]}>Cancel</Text>
+              <Text style={[styles.cancelText, { color: theme.textSecondary }]}>Отмена</Text>
             </TouchableOpacity>
           </>
         )}
@@ -137,36 +137,36 @@ export default function ShieldOverlay() {
             <Animated.Text style={[styles.countdown, { color: theme.accent, transform: [{ scale: pulse }] }]}>
               {mm}:{ss}
             </Animated.Text>
-            <Text style={[styles.body, { color: theme.text }]}>The fortress holds. Do not leave.</Text>
+            <Text style={[styles.body, { color: theme.text }]}>Крепость держится. Не выходи.</Text>
             <Text style={[styles.warning, { color: theme.textSecondary }]}>
-              Leaving THE SYSTEM now breaches the fortress.
+              Выход из СИСТЕМЫ сейчас разрушит крепость.
             </Text>
           </>
         )}
 
         {phase === 'held' && (
           <>
-            <Text style={[styles.resultBig, { color: theme.accent }]}>Fortress held</Text>
+            <Text style={[styles.resultBig, { color: theme.accent }]}>Крепость выстояла</Text>
             <Text style={[styles.body, { color: theme.text }]}>
-              {minutes} minutes of pure focus. The System registers your discipline.
+              {minutes} мин. чистого фокуса. Система засчитывает твою дисциплину.
             </Text>
             <TouchableOpacity style={[styles.lockBtn, { backgroundColor: theme.accent }]} onPress={close}>
-              <Text style={[styles.lockBtnText, { color: '#001018' }]}>Return</Text>
+              <Text style={[styles.lockBtnText, { color: '#001018' }]}>Вернуться</Text>
             </TouchableOpacity>
           </>
         )}
 
         {phase === 'breached' && (
           <>
-            <Text style={[styles.resultBig, { color: DANGER }]}>Fortress breached</Text>
+            <Text style={[styles.resultBig, { color: DANGER }]}>Крепость пала</Text>
             <Text style={[styles.body, { color: theme.text }]}>
-              You left before the timer ended. Weakness wins this round. Engage again.
+              Выход до конца таймера. Этот раунд за слабостью. Попробуй снова.
             </Text>
             <TouchableOpacity style={[styles.lockBtn, { backgroundColor: DANGER }]} onPress={() => setPhase('select')}>
-              <Text style={styles.lockBtnText}>Try again</Text>
+              <Text style={styles.lockBtnText}>Ещё раз</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.cancelBtn} onPress={close}>
-              <Text style={[styles.cancelText, { color: theme.textSecondary }]}>Retreat</Text>
+              <Text style={[styles.cancelText, { color: theme.textSecondary }]}>Отступить</Text>
             </TouchableOpacity>
           </>
         )}

@@ -68,7 +68,7 @@ export default function Settings() {
     try {
       await UsageStatsModule.openUsageAccessSettings();
     } catch {
-      setInfo({ title: 'UNAVAILABLE', message: 'Social media tracking needs the native build.' });
+      setInfo({ title: 'НЕДОСТУПНО', message: 'Отслеживание соцсетей работает только в установленном приложении.' });
     }
   };
 
@@ -107,7 +107,7 @@ export default function Settings() {
       if (canShare) {
         await Sharing.shareAsync(filePath, {
           mimeType: 'application/json',
-          dialogTitle: 'Export THE SYSTEM Data',
+          dialogTitle: 'Экспорт данных СИСТЕМЫ',
         });
       } else {
         Alert.alert('EXPORTED', `Saved to: ${filePath}`);
@@ -133,20 +133,20 @@ export default function Settings() {
       try {
         data = JSON.parse(content);
       } catch {
-        setInfo({ title: 'IMPORT ERROR', message: 'File is not valid JSON.' });
+        setInfo({ title: 'ОШИБКА ИМПОРТА', message: 'Файл не является корректным JSON.' });
         return;
       }
 
       const check = validateImport(data);
       if (!check.ok) {
-        setInfo({ title: 'IMPORT ERROR', message: check.error ?? 'Invalid export file.' });
+        setInfo({ title: 'ОШИБКА ИМПОРТА', message: check.error ?? 'Неверный файл экспорта.' });
         return;
       }
 
       // Stage it; the confirm modal guards the destructive overwrite.
       setPendingImport(data as ExportBundle);
     } catch (err) {
-      setInfo({ title: 'IMPORT ERROR', message: String(err) });
+      setInfo({ title: 'ОШИБКА ИМПОРТА', message: String(err) });
     }
   };
 
@@ -156,15 +156,15 @@ export default function Settings() {
     if (!bundle) return;
     try {
       await importJourney(bundle);
-      setInfo({ title: 'IMPORTED', message: 'Progress restored from backup.' });
+      setInfo({ title: 'ИМПОРТ ЗАВЕРШЁН', message: 'Прогресс восстановлен из резервной копии.' });
     } catch (err) {
-      setInfo({ title: 'IMPORT ERROR', message: String(err) });
+      setInfo({ title: 'ОШИБКА ИМПОРТА', message: String(err) });
     }
   };
 
   const handleResetJourney = async () => {
-    if (resetConfirm.trim() !== 'I ACCEPT THE RESET') {
-      setInfo({ title: 'TYPE THE PHRASE', message: 'Type exactly: I ACCEPT THE RESET' });
+    if (resetConfirm.trim() !== 'Я ПРИНИМАЮ СБРОС') {
+      setInfo({ title: 'ВВЕДИ ФРАЗУ', message: 'Введи точно: Я ПРИНИМАЮ СБРОС' });
       return;
     }
     setResetModal(true);
@@ -176,7 +176,7 @@ export default function Settings() {
       setResetConfirm('');
       await resetJourney();
     } catch (err) {
-      setInfo({ title: 'RESET ERROR', message: String(err) });
+      setInfo({ title: 'ОШИБКА СБРОСА', message: String(err) });
     }
   };
 
@@ -189,15 +189,15 @@ export default function Settings() {
       <SystemBackground color={theme.accent} background={theme.background} />
       <AmbientEmbers color={theme.auraColor ?? theme.accent} />
       <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
-        <Text style={[styles.title, { color: theme.text }]}>Settings</Text>
+        <Text style={[styles.title, { color: theme.text }]}>Настройки</Text>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.closeBtn}>
           <Glyph name="close" color={theme.textSecondary} size={20} />
         </TouchableOpacity>
       </View>
 
       <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
-        <Text style={[styles.sectionHeader, { color: theme.accent }]}>Notifications</Text>
-        <Text style={[styles.label, { color: theme.textSecondary }]}>Interval (hours)</Text>
+        <Text style={[styles.sectionHeader, { color: theme.accent }]}>Уведомления</Text>
+        <Text style={[styles.label, { color: theme.textSecondary }]}>Интервал (часы)</Text>
         <View style={styles.intervalRow}>
           {INTERVALS.map((v) => (
             <TouchableOpacity
@@ -213,14 +213,14 @@ export default function Settings() {
             >
               <CornerBrackets color={notifInterval === v ? theme.accent : theme.textSecondary} />
               <Text style={[styles.intervalText, { color: notifInterval === v ? theme.accent : theme.textSecondary }]}>
-                {v}h
+                {v} ч
               </Text>
             </TouchableOpacity>
           ))}
         </View>
 
         <Text style={[styles.label, { color: theme.textSecondary }]}>
-          Quiet hours (no reminders) — HH:MM
+          Тихие часы (без напоминаний) — ЧЧ:ММ
         </Text>
         <View style={styles.quietRow}>
           <View style={styles.quietField}>
@@ -236,7 +236,7 @@ export default function Settings() {
             />
             <CornerBrackets color={theme.accent} length={8} />
           </View>
-          <Text style={[styles.label, { color: theme.textSecondary, marginBottom: 0 }]}>to</Text>
+          <Text style={[styles.label, { color: theme.textSecondary, marginBottom: 0 }]}>до</Text>
           <View style={styles.quietField}>
             <TextInput
               style={[styles.input, { color: theme.text, borderColor: theme.accent }]}
@@ -252,10 +252,10 @@ export default function Settings() {
           </View>
         </View>
 
-        <Text style={[styles.sectionHeader, { color: theme.accent }]}>Permissions</Text>
+        <Text style={[styles.sectionHeader, { color: theme.accent }]}>Разрешения</Text>
         <Text style={[styles.label, { color: theme.textSecondary }]}>
-          Social media access — lets The Veil auto-track Instagram & TikTok time.
-          {usageGranted === null ? '' : usageGranted ? '  ✓ Granted' : '  ✗ Not granted'}
+          Доступ к статистике — Завеса сама считает время в Instagram и TikTok.
+          {usageGranted === null ? '' : usageGranted ? '  ✓ Разрешено' : '  ✗ Не разрешено'}
         </Text>
         <TouchableOpacity
           style={[styles.exportButton, { borderColor: theme.accent }]}
@@ -263,28 +263,28 @@ export default function Settings() {
         >
           <CornerBrackets color={theme.accent} />
           <Text style={[styles.exportText, { color: theme.accent }]}>
-            {usageGranted ? 'Manage social media access' : 'Grant social media access'}
+            {usageGranted ? 'Управлять доступом' : 'Дать доступ к статистике'}
           </Text>
         </TouchableOpacity>
 
-        <Text style={[styles.sectionHeader, { color: theme.accent }]}>About</Text>
-        <Text style={[styles.infoText, { color: theme.text }]}>Player: {hero?.name ?? 'Unknown'}</Text>
-        <Text style={[styles.infoText, { color: theme.text }]}>Journey start: {hero?.journey_start_date ?? '—'}</Text>
-        <Text style={[styles.infoText, { color: theme.text }]}>Day {journeyDays} of 180</Text>
+        <Text style={[styles.sectionHeader, { color: theme.accent }]}>О тебе</Text>
+        <Text style={[styles.infoText, { color: theme.text }]}>Игрок: {hero?.name ?? 'Неизвестно'}</Text>
+        <Text style={[styles.infoText, { color: theme.text }]}>Начало пути: {hero?.journey_start_date ?? '—'}</Text>
+        <Text style={[styles.infoText, { color: theme.text }]}>День {journeyDays} из 180</Text>
 
         {/* Data */}
-        <Text style={[styles.sectionHeader, { color: theme.accent }]}>Data</Text>
+        <Text style={[styles.sectionHeader, { color: theme.accent }]}>Данные</Text>
         <TouchableOpacity
           style={[styles.exportButton, { borderColor: theme.accent }]}
           onPress={handleExport}
         >
           <CornerBrackets color={theme.accent} />
           <Text style={[styles.exportText, { color: theme.accent }]}>
-            Export data (JSON)
+            Экспорт данных (JSON)
           </Text>
         </TouchableOpacity>
         <Text style={[styles.label, { color: theme.textSecondary }]}>
-          Exports all progress to a JSON file for manual backup.
+          Сохраняет весь прогресс в JSON-файл — резервная копия.
         </Text>
 
         <TouchableOpacity
@@ -293,11 +293,11 @@ export default function Settings() {
         >
           <CornerBrackets color={theme.accent} />
           <Text style={[styles.exportText, { color: theme.accent }]}>
-            Import data (JSON)
+            Импорт данных (JSON)
           </Text>
         </TouchableOpacity>
         <Text style={[styles.label, { color: theme.textSecondary }]}>
-          Restores progress from an export file. Overwrites ALL current data.
+          Восстанавливает прогресс из файла. ВСЕ текущие данные будут заменены.
         </Text>
 
         <TouchableOpacity
@@ -305,37 +305,37 @@ export default function Settings() {
           onPress={async () => {
             const banner = hero ? `notif_${hero.hero_class.toLowerCase()}_${hero.rank.toLowerCase()}` : undefined;
             const ok = await RichNotification.presentNow(
-              'THE SYSTEM',
-              'The System tests your resolve. Answer the call.',
+              'СИСТЕМА',
+              'Система проверяет твою решимость. Ответь на вызов.',
               banner
             );
-            if (!ok) Alert.alert('NOTIFICATION', 'Rich notifications need the latest native build. Rebuild the app.');
+            if (!ok) Alert.alert('УВЕДОМЛЕНИЕ', 'Расширенные уведомления требуют свежей сборки приложения.');
           }}
         >
           <CornerBrackets color={theme.accent} />
-          <Text style={[styles.exportText, { color: theme.accent }]}>Test notification</Text>
+          <Text style={[styles.exportText, { color: theme.accent }]}>Тестовое уведомление</Text>
         </TouchableOpacity>
 
-        <Text style={[styles.sectionHeader, { color: '#ff4444' }]}>Danger zone</Text>
+        <Text style={[styles.sectionHeader, { color: '#ff4444' }]}>Опасная зона</Text>
         <Text style={[styles.label, { color: theme.textSecondary }]}>
-          Type "I ACCEPT THE RESET" to enable reset:
+          Введи «Я ПРИНИМАЮ СБРОС», чтобы включить сброс:
         </Text>
         <View style={styles.inputWrap}>
           <TextInput
             style={[styles.input, { color: theme.text, borderColor: '#ff4444' }]}
             value={resetConfirm}
             onChangeText={setResetConfirm}
-            placeholder="Type here..."
+            placeholder="Введи здесь..."
             placeholderTextColor={theme.textSecondary}
             autoCapitalize="characters"
           />
           <CornerBrackets color="#ff4444" />
         </View>
         <TouchableOpacity
-          style={[styles.resetButton, { backgroundColor: resetConfirm === 'I ACCEPT THE RESET' ? '#ff4444' : '#333' }]}
+          style={[styles.resetButton, { backgroundColor: resetConfirm === 'Я ПРИНИМАЮ СБРОС' ? '#ff4444' : '#333' }]}
           onPress={handleResetJourney}
         >
-          <Text style={styles.resetText}>Reset journey</Text>
+          <Text style={styles.resetText}>Сбросить путь</Text>
         </TouchableOpacity>
 
         <View style={styles.bottomPadding} />
@@ -344,10 +344,10 @@ export default function Settings() {
       <ConfirmModal
         visible={resetModal}
         destructive
-        title="FINAL WARNING"
-        message="This will wipe ALL data. There is no undo."
-        cancelText="CANCEL"
-        confirmText="RESET"
+        title="ПОСЛЕДНЕЕ ПРЕДУПРЕЖДЕНИЕ"
+        message="Это сотрёт ВСЕ данные. Отменить нельзя."
+        cancelText="ОТМЕНА"
+        confirmText="СБРОСИТЬ"
         onCancel={() => setResetModal(false)}
         onConfirm={performReset}
       />
@@ -355,10 +355,10 @@ export default function Settings() {
       <ConfirmModal
         visible={pendingImport !== null}
         destructive
-        title="OVERWRITE ALL DATA?"
-        message="Importing replaces your hero, logs, streaks, and everything else with the backup file. There is no undo."
-        cancelText="CANCEL"
-        confirmText="IMPORT"
+        title="ЗАМЕНИТЬ ВСЕ ДАННЫЕ?"
+        message="Импорт заменит героя, историю, серии и всё остальное данными из файла. Отменить нельзя."
+        cancelText="ОТМЕНА"
+        confirmText="ИМПОРТ"
         onCancel={() => setPendingImport(null)}
         onConfirm={performImport}
       />

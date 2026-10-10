@@ -23,6 +23,6 @@ describe('SRankCutscene', () => {
     expect(json).not.toBeNull();
     // Should contain FRAME I in the rendered tree
     const str = JSON.stringify(json);
-    expect(str).toContain('FRAME I');
+    expect(str).toContain('КАДР I');
   });
 });

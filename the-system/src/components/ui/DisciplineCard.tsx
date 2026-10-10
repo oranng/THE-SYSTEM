@@ -8,6 +8,7 @@ import CornerFrame from './CornerFrame';
 import { CornerBrackets } from './CornerBox';
 import FadeInView from '../fx/FadeInView';
 import Glyph from '../icons/Glyph';
+import { DIFFICULTY_LABELS } from '../../i18n/labels';
 
 interface Props {
   discipline: Discipline;
@@ -27,10 +28,10 @@ const DIFFICULTY_COLORS: Record<string, string> = {
 };
 
 const DIFFICULTY_ABBR: Record<string, string> = {
-  EASY: 'E',
-  NORMAL: 'N',
-  HARD: 'H',
-  LEGENDARY: 'L',
+  EASY: 'I',
+  NORMAL: 'II',
+  HARD: 'III',
+  LEGENDARY: 'IV',
 };
 
 function DiffIcon({ color }: { color: string }) {
@@ -111,7 +112,7 @@ export default function DisciplineCard({ discipline, log, theme, onComplete, onF
               <Text style={styles.xpLoss}>−{discipline.xp_loss}</Text>
             )}
             <View style={[styles.diffPill, { borderColor: diffColor + '70', backgroundColor: diffColor + '15' }]}>
-              <Text style={[styles.diffText, { color: diffColor }]}>{discipline.difficulty}</Text>
+              <Text style={[styles.diffText, { color: diffColor }]}>{DIFFICULTY_LABELS[discipline.difficulty] ?? discipline.difficulty}</Text>
             </View>
             {discipline.deadline_time ? (
               <Text style={[styles.deadline, { color: theme.textSecondary }]}>

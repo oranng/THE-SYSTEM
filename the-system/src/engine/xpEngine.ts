@@ -97,6 +97,34 @@ export async function triggerRelapse(date: string): Promise<void> {
   await setSystemState('last_midnight_date', date);
 }
 
+/**
+ * Award XP that is not tied to a daily trial (story path steps, weekly boss).
+ * Large rewards can cross several levels at once, so level-ups are applied
+ * until the hero catches up; the returned event describes the final level and
+ * whether the rank changed anywhere along the way.
+ */
+export async function grantBonusXP(amount: number): Promise<LevelUpEvent | null> {
+  if (amount <= 0) return null;
+  const before = await getHero();
+  if (!before) return null;
+  await addGlobalXP(amount);
+
+  let last: LevelUpEvent | null = null;
+  for (let guard = 0; guard < 50; guard++) {
+    const event = await checkLevelUp();
+    if (!event) break;
+    last = event;
+  }
+  if (!last) return null;
+  return { ...last, rankChanged: last.newRank !== before.rank };
+}
+
+/** Take back bonus XP (undoing a path step). Levels are never lost, like fails. */
+export async function revokeBonusXP(amount: number): Promise<void> {
+  if (amount <= 0) return;
+  await deductGlobalXP(amount);
+}
+
 async function addGlobalXP(amount: number): Promise<void> {
   const hero = await getHero();
   if (!hero) return;

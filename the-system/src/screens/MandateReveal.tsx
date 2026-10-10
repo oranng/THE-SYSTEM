@@ -9,6 +9,7 @@ import { useSystemStore } from '../store/useSystemStore';
 import { CornerBrackets } from '../components/ui/CornerBox';
 import type { RootStackParamList } from '../navigation/types';
 import { FONTS } from '../theme/typography';
+import { TIER_LABELS } from '../i18n/labels';
 
 type Nav = StackNavigationProp<RootStackParamList>;
 
@@ -25,13 +26,13 @@ const TIER_BG: Record<string, string> = {
 };
 
 const LOOT_TYPE_LABELS: Record<string, string> = {
-  scroll: 'System scroll',
-  title: 'Title unlocked',
-  accessory: 'Accessory',
-  cosmetic_variant: 'Cosmetic variant',
-  background: 'Background unlocked',
-  equipment_tier: 'Equipment upgrade',
-  aura_variant: 'Aura variant',
+  scroll: 'Свиток Системы',
+  title: 'Новый титул',
+  accessory: 'Аксессуар',
+  cosmetic_variant: 'Новый облик',
+  background: 'Новый фон',
+  equipment_tier: 'Улучшение снаряжения',
+  aura_variant: 'Новая аура',
 };
 
 function ChestSvg({ color, opened }: { color: string; opened: boolean }) {
@@ -156,9 +157,9 @@ export default function MandateReveal() {
         <View style={styles.titleRow}>
           <View style={[styles.titleLine, { backgroundColor: tierColor + '50' }]} />
           <Text style={[styles.tier, { color: tierColor }]}>
-            {pendingMandate?.tier ?? 'BRONZE'}
+            {TIER_LABELS[pendingMandate?.tier ?? 'BRONZE'] ?? pendingMandate?.tier}
           </Text>
-          <Text style={[styles.mandateWord, { color: tierColor + 'aa' }]}>Mandate</Text>
+          <Text style={[styles.mandateWord, { color: tierColor + 'aa' }]}>мандат</Text>
           <View style={[styles.titleLine, { backgroundColor: tierColor + '50' }]} />
         </View>
 
@@ -177,7 +178,7 @@ export default function MandateReveal() {
             <TouchableOpacity style={styles.tapArea} onPress={handleTapChest}>
               <View style={[styles.tapBtn, { borderColor: tierColor + '70', backgroundColor: tierColor + '15' }]}>
                 <CornerBrackets color={tierColor + '70'} />
-                <Text style={[styles.tapText, { color: tierColor }]}>▶ Open mandate</Text>
+                <Text style={[styles.tapText, { color: tierColor }]}>▶ Открыть мандат</Text>
               </View>
             </TouchableOpacity>
           </>
@@ -200,14 +201,14 @@ export default function MandateReveal() {
               onPress={() => navigation.goBack()}
             >
               <CornerBrackets color={tierColor} />
-              <Text style={[styles.dismissTxt, { color: tierColor }]}>Mandate received</Text>
+              <Text style={[styles.dismissTxt, { color: tierColor }]}>Мандат получен</Text>
             </TouchableOpacity>
           </Animated.View>
         )}
 
         {!opened && (
           <TouchableOpacity style={styles.closeBtn} onPress={() => navigation.goBack()}>
-            <Text style={[styles.closeTxt, { color: theme.textSecondary }]}>Close</Text>
+            <Text style={[styles.closeTxt, { color: theme.textSecondary }]}>Закрыть</Text>
           </TouchableOpacity>
         )}
       </View>

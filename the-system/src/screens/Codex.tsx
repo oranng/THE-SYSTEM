@@ -15,6 +15,7 @@ import ConfirmModal from '../components/ui/ConfirmModal';
 import DisciplineEmblem from '../components/icons/DisciplineEmblem';
 import Glyph from '../components/icons/Glyph';
 import { FONTS } from '../theme/typography';
+import { DIFFICULTY_LABELS } from '../i18n/labels';
 
 const DIFFICULTY_OPTIONS = ['EASY', 'NORMAL', 'HARD', 'LEGENDARY'] as const;
 type Difficulty = typeof DIFFICULTY_OPTIONS[number];
@@ -48,9 +49,9 @@ export default function Codex() {
   const handleToggleActive = async (d: Discipline) => {
     if (d.code === 'SILENCE' && d.is_active) {
       setConfirm({
-        title: 'DISABLE SILENCE?',
-        message: 'Disabling SILENCE Protocol removes streak tracking.',
-        confirmText: 'DISABLE',
+        title: 'ОТКЛЮЧИТЬ ТИШИНУ?',
+        message: 'Если отключить Протокол Тишины, серия перестанет считаться.',
+        confirmText: 'ОТКЛЮЧИТЬ',
         onConfirm: async () => { await setDisciplineActive(d.id, !d.is_active); await refresh(); },
       });
     } else {
@@ -61,20 +62,20 @@ export default function Codex() {
 
   const handleDelete = (d: Discipline) => {
     if (!d.is_custom) {
-      Alert.alert('CANNOT DELETE', 'Core disciplines cannot be deleted. You can disable them.');
+      Alert.alert('НЕЛЬЗЯ УДАЛИТЬ', 'Базовые испытания удалить нельзя, но их можно выключить.');
       return;
     }
     setConfirm({
-      title: 'DELETE DISCIPLINE',
-      message: `Delete "${d.name}"? All logs will also be deleted.`,
-      confirmText: 'DELETE',
+      title: 'УДАЛИТЬ ИСПЫТАНИЕ',
+      message: `Удалить «${d.name}»? Вся история по нему тоже будет удалена.`,
+      confirmText: 'УДАЛИТЬ',
       onConfirm: async () => { await deleteDiscipline(d.id); await refresh(); },
     });
   };
 
   const handleAddSubmit = async () => {
     if (!form.name.trim()) {
-      Alert.alert('NAME REQUIRED', 'Enter a name for this discipline.');
+      Alert.alert('НУЖНО НАЗВАНИЕ', 'Введи название испытания.');
       return;
     }
     const [xpGain, xpLoss] = XP_DEFAULTS[form.difficulty];
@@ -96,10 +97,10 @@ export default function Codex() {
       <SystemBackground color={theme.accent} background={theme.background} />
       <AmbientEmbers color={theme.auraColor ?? theme.accent} />
       <View style={[styles.header, { paddingTop: insets.top + 14 }]}>
-        <Text style={[styles.title, { color: theme.text }]}>The Codex</Text>
+        <Text style={[styles.title, { color: theme.text }]}>Кодекс</Text>
         <TouchableOpacity style={[styles.addBtn, { borderColor: theme.accent }]} onPress={() => setShowAdd(true)}>
           <CornerBrackets color={theme.accent} />
-          <Text style={[styles.addBtnText, { color: theme.accent }]}>+ Add</Text>
+          <Text style={[styles.addBtnText, { color: theme.accent }]}>+ Добавить</Text>
         </TouchableOpacity>
       </View>
 
@@ -116,13 +117,13 @@ export default function Codex() {
                 <Text style={[styles.rowName, { color: theme.text }]}>{d.name}</Text>
                 <View style={styles.rowMeta}>
                   <View style={[styles.diffBadge, { backgroundColor: diffColor + '30', borderColor: diffColor }]}>
-                    <Text style={[styles.diffText, { color: diffColor }]}>{d.difficulty}</Text>
+                    <Text style={[styles.diffText, { color: diffColor }]}>{DIFFICULTY_LABELS[d.difficulty] ?? d.difficulty}</Text>
                   </View>
                   <Text style={[styles.xpText, { color: '#4caf50' }]}>+{d.xp_gain}</Text>
                   <Text style={[styles.xpText, { color: '#f44336' }]}>-{d.xp_loss}</Text>
                 </View>
                 {d.deadline_time && (
-                  <Text style={[styles.deadlineText, { color: theme.textSecondary }]}>Deadline: {d.deadline_time}</Text>
+                  <Text style={[styles.deadlineText, { color: theme.textSecondary }]}>Срок: до {d.deadline_time}</Text>
                 )}
               </View>
               <View style={styles.actions}>
@@ -132,7 +133,7 @@ export default function Codex() {
                 >
                   <CornerBrackets color={d.is_active ? theme.accent : '#444444'} length={8} />
                   <Text style={[styles.toggleText, { color: d.is_active ? theme.accent : '#666666' }]}>
-                    {d.is_active ? 'ON' : 'OFF'}
+                    {d.is_active ? 'ВКЛ' : 'ВЫКЛ'}
                   </Text>
                 </TouchableOpacity>
                 {d.is_custom && (
@@ -142,7 +143,7 @@ export default function Codex() {
                   >
                     <CornerBrackets color="#f44336" length={8} />
                     <Glyph name="close" color="#f44336" size={11} />
-                    <Text style={styles.deleteText}>DEL</Text>
+                    <Text style={styles.deleteText}>УДАЛ.</Text>
                   </TouchableOpacity>
                 )}
               </View>
@@ -155,35 +156,35 @@ export default function Codex() {
       <Modal visible={showAdd} transparent animationType="slide" onRequestClose={() => setShowAdd(false)}>
         <View style={styles.modalOverlay}>
           <View style={[styles.modalBox, { backgroundColor: theme.background, borderColor: theme.accent }]}>
-            <Text style={[styles.modalTitle, { color: theme.text }]}>Add discipline</Text>
+            <Text style={[styles.modalTitle, { color: theme.text }]}>Новое испытание</Text>
 
-            <Text style={[styles.formLabel, { color: theme.textSecondary }]}>Name</Text>
+            <Text style={[styles.formLabel, { color: theme.textSecondary }]}>Название</Text>
             <View style={styles.inputWrap}>
               <TextInput
                 style={[styles.input, { color: theme.text, borderColor: theme.accent }]}
                 value={form.name}
                 onChangeText={(v) => setForm({ ...form, name: v })}
-                placeholder="Discipline name"
+                placeholder="Например: 30 минут английского"
                 placeholderTextColor={theme.textSecondary}
                 maxLength={40}
               />
               <CornerBrackets color={theme.accent} length={8} />
             </View>
 
-            <Text style={[styles.formLabel, { color: theme.textSecondary }]}>Description</Text>
+            <Text style={[styles.formLabel, { color: theme.textSecondary }]}>Описание</Text>
             <View style={styles.inputWrap}>
               <TextInput
                 style={[styles.input, { color: theme.text, borderColor: theme.accent }]}
                 value={form.description}
                 onChangeText={(v) => setForm({ ...form, description: v })}
-                placeholder="Brief description"
+                placeholder="Коротко: что именно сделать"
                 placeholderTextColor={theme.textSecondary}
                 maxLength={100}
               />
               <CornerBrackets color={theme.accent} length={8} />
             </View>
 
-            <Text style={[styles.formLabel, { color: theme.textSecondary }]}>Difficulty</Text>
+            <Text style={[styles.formLabel, { color: theme.textSecondary }]}>Сложность</Text>
             <View style={styles.diffRow}>
               {DIFFICULTY_OPTIONS.map((opt) => (
                 <TouchableOpacity
@@ -193,13 +194,13 @@ export default function Codex() {
                 >
                   <CornerBrackets color={form.difficulty === opt ? DIFFICULTY_COLORS[opt] : '#444444'} length={8} />
                   <Text style={[styles.diffOptionText, { color: form.difficulty === opt ? DIFFICULTY_COLORS[opt] : '#666666' }]}>
-                    {opt.slice(0, 4)}
+                    {DIFFICULTY_LABELS[opt].slice(0, 5)}
                   </Text>
                 </TouchableOpacity>
               ))}
             </View>
 
-            <Text style={[styles.formLabel, { color: theme.textSecondary }]}>DEADLINE (HH:MM)</Text>
+            <Text style={[styles.formLabel, { color: theme.textSecondary }]}>СРОК (ЧЧ:ММ)</Text>
             <View style={styles.inputWrap}>
               <TextInput
                 style={[styles.input, { color: theme.text, borderColor: theme.accent }]}
@@ -215,10 +216,10 @@ export default function Codex() {
             <View style={styles.modalActions}>
               <TouchableOpacity style={[styles.cancelBtn, { borderColor: '#666666' }]} onPress={() => { setShowAdd(false); setForm(BLANK_FORM); }}>
                 <CornerBrackets color="#666666" />
-                <Text style={[styles.cancelText, { color: '#666666' }]}>Cancel</Text>
+                <Text style={[styles.cancelText, { color: '#666666' }]}>Отмена</Text>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.submitBtn, { backgroundColor: theme.accent }]} onPress={handleAddSubmit}>
-                <Text style={styles.submitText}>Create</Text>
+                <Text style={styles.submitText}>Создать</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -230,8 +231,8 @@ export default function Codex() {
         destructive
         title={confirm?.title ?? ''}
         message={confirm?.message ?? ''}
-        confirmText={confirm?.confirmText ?? 'CONFIRM'}
-        cancelText="CANCEL"
+        confirmText={confirm?.confirmText ?? 'ПОДТВЕРДИТЬ'}
+        cancelText="ОТМЕНА"
         onCancel={() => setConfirm(null)}
         onConfirm={() => {
           confirm?.onConfirm();

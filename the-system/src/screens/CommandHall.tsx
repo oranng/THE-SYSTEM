@@ -24,6 +24,7 @@ import { getRandomQuote } from '../data/quotes';
 import { getSystemState, setSystemState } from '../db/queries';
 import Glyph from '../components/icons/Glyph';
 import { FONTS } from '../theme/typography';
+import { TIER_LABELS, plural } from '../i18n/labels';
 
 const ORBIT_BY_RANK: Record<string, number> = { E: 0, D: 2, C: 3, B: 5, A: 7, S: 10 };
 import type { Rank } from '../types';
@@ -91,7 +92,7 @@ function PresenceWidget({ theme }: { theme: any }) {
       >
         <CornerBrackets color={theme.accent + '50'} length={8} />
         <Text style={[styles.presenceGrantTxt, { color: theme.accent }]}>
-          Grant social media access — track The Veil
+          Дай доступ к статистике — Система будет следить за Завесой
         </Text>
       </TouchableOpacity>
     );
@@ -107,11 +108,11 @@ function PresenceBar({ minutes, theme }: { minutes: number; theme: any }) {
   return (
     <View style={styles.presenceWrap}>
       <View style={styles.presenceRow}>
-        <Text style={[styles.presenceLabel, { color: theme.textSecondary }]}>Social media</Text>
+        <Text style={[styles.presenceLabel, { color: theme.textSecondary }]}>Соцсети</Text>
         <View style={styles.presenceTimeRow}>
-          <Text style={[styles.presenceTime, { color: barColor }]}>{Math.round(minutes)}m</Text>
+          <Text style={[styles.presenceTime, { color: barColor }]}>{Math.round(minutes)} мин</Text>
           <Glyph name={overLimit ? 'up' : 'check'} color={barColor} size={12} />
-          <Text style={[styles.presenceTime, { color: barColor }]}>{overLimit ? 'EXCEEDED' : 'OK'}</Text>
+          <Text style={[styles.presenceTime, { color: barColor }]}>{overLimit ? 'ПРЕВЫШЕНО' : 'В НОРМЕ'}</Text>
         </View>
       </View>
       <View style={[styles.presenceBg, { backgroundColor: '#2A2725' }]}>
@@ -220,7 +221,7 @@ export default function CommandHall() {
   const handlePetition = async () => {
     const granted = await requestMandate();
     if (!granted) {
-      setPetitionInfo('The System grants no mandate yet. Petition again 7 days after your last one.');
+      setPetitionInfo('Система пока не выдаёт мандат. Просить снова можно через 7 дней после прошлой просьбы.');
     }
     // On success the chest appears via the refreshed pendingMandate.
   };
@@ -249,10 +250,10 @@ export default function CommandHall() {
           <View style={styles.dayRow}>
             <View style={[styles.dayDot, { backgroundColor: relapseLocked ? '#8a3b3b' : theme.accent }]} />
             {relapseLocked ? (
-              <Text style={[styles.dayText, { color: '#c97b7b' }]}>Fallen</Text>
+              <Text style={[styles.dayText, { color: '#c97b7b' }]}>Падение</Text>
             ) : (
               <>
-                <Text style={[styles.dayText, { color: theme.accent }]}>Day {dayNumber}</Text>
+                <Text style={[styles.dayText, { color: theme.accent }]}>День {dayNumber}</Text>
                 <Text style={[styles.dayOf, { color: theme.textSecondary }]}> / 180</Text>
               </>
             )}
@@ -324,7 +325,7 @@ export default function CommandHall() {
         {silenceStreak && silenceStreak.current_streak > 0 && (
           <View style={styles.streakBox}>
             <PixelText size={32} color={theme.accent}>{String(silenceStreak.current_streak)}</PixelText>
-            <Text style={[styles.streakLabel, { color: theme.textSecondary }]}>Days clean</Text>
+            <Text style={[styles.streakLabel, { color: theme.textSecondary }]}>{plural(silenceStreak.current_streak, ['день', 'дня', 'дней'])} чистоты</Text>
           </View>
         )}
 
@@ -337,7 +338,7 @@ export default function CommandHall() {
             >
               <CornerBrackets color={theme.accent} thickness={1.5} length={8} />
               <Glyph name="chest" color={theme.accent} size={28} />
-              <Text style={[styles.chestTier, { color: theme.accent }]}>{pendingMandate.tier}</Text>
+              <Text style={[styles.chestTier, { color: theme.accent }]}>{TIER_LABELS[pendingMandate.tier] ?? pendingMandate.tier}</Text>
             </TouchableOpacity>
           </Animated.View>
         ) : relapseLocked ? null : (
@@ -348,7 +349,7 @@ export default function CommandHall() {
             >
               <CornerBrackets color={theme.accent + '50'} thickness={1.5} length={8} />
               <Glyph name="chest" color={theme.accent + '80'} size={28} />
-              <Text style={[styles.chestTier, { color: theme.accent + 'aa' }]}>PETITION</Text>
+              <Text style={[styles.chestTier, { color: theme.accent + 'aa' }]}>ПРОСЬБА</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -362,7 +363,7 @@ export default function CommandHall() {
 
       {/* ── QUEST LOG ── */}
       <SectionDivider
-        title="Daily objectives"
+        title="Испытания дня"
         color={theme.accent}
         style={styles.sectionDivider}
       />
@@ -370,12 +371,12 @@ export default function CommandHall() {
       {relapseLocked ? (
         <View style={[styles.fallenBanner, { borderColor: '#8a3b3b', backgroundColor: '#1a0d0d' }]}>
           <CornerBrackets color="#8a3b3b" length={8} />
-          <Text style={styles.fallenText}>You fell. Trials locked until tomorrow.</Text>
+          <Text style={styles.fallenText}>Срыв. Испытания закрыты до завтра.</Text>
         </View>
       ) : (
         <View style={styles.questProgress}>
           <Text style={[styles.questCount, { color: theme.textSecondary }]}>
-            {completedToday}/{activeDisciplines.length} complete
+            выполнено {completedToday}/{activeDisciplines.length}
           </Text>
           <View style={[styles.questProgressBar, { backgroundColor: '#2A2725' }]}>
             <View
@@ -419,10 +420,10 @@ export default function CommandHall() {
               <CornerBrackets color="#ff4444" thickness={1.5} length={10} />
               <View style={styles.shieldTitleRow}>
                 <Glyph name="shield" color="#ff4444" size={18} />
-                <Text style={styles.shieldText}>Shield Protocol</Text>
+                <Text style={styles.shieldText}>Протокол Щита</Text>
                 <Glyph name="shield" color="#ff4444" size={18} />
               </View>
-              <Text style={styles.shieldSub}>Engage digital fortress</Text>
+              <Text style={styles.shieldSub}>Включить цифровую крепость</Text>
             </View>
           </TouchableOpacity>
         </View>
@@ -431,10 +432,10 @@ export default function CommandHall() {
       <ConfirmModal
         visible={silenceConfirm}
         destructive
-        title="SILENCE PROTOCOL BROKEN"
-        message="Your progress resets to zero — XP, level, rank, history, mandates, and loot all erased, the journey restarts at Day 1. Your name and star remain, and the relapse is etched into your record. There is no undo."
-        cancelText="CANCEL"
-        confirmText="I HAVE FALLEN"
+        title="ПРОТОКОЛ ТИШИНЫ НАРУШЕН"
+        message="Прогресс обнулится: опыт, уровень, ранг, история, мандаты и трофеи будут стёрты, путь начнётся заново с первого дня. Имя и звезда останутся, а срыв навсегда войдёт в твою летопись. Отменить нельзя."
+        cancelText="ОТМЕНА"
+        confirmText="ПРИЗНАЮ СРЫВ"
         onCancel={() => setSilenceConfirm(false)}
         onConfirm={() => {
           setSilenceConfirm(false);
@@ -445,7 +446,7 @@ export default function CommandHall() {
       <ConfirmModal
         visible={petitionInfo !== null}
         singleButton
-        title="THE SYSTEM"
+        title="СИСТЕМА"
         message={petitionInfo ?? ''}
         confirmText="OK"
         onCancel={() => setPetitionInfo(null)}

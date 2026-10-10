@@ -18,10 +18,10 @@ export const ATTRIBUTES: Attribute[] = ['Willpower', 'Strength', 'Vitality', 'Kn
 
 /** Which core discipline codes feed which attribute. */
 export const ATTRIBUTE_CODES: Record<Attribute, string[]> = {
-  Willpower: ['SILENCE', 'PRESENCE'],
+  Willpower: ['SILENCE', 'PRESENCE', 'WEALTH', 'PLAN'],
   Strength: ['FORGE', 'RISE'],
-  Vitality: ['NOURISH', 'REST', 'RITUAL'],
-  Knowledge: ['KNOWLEDGE'],
+  Vitality: ['NOURISH', 'REST', 'RITUAL', 'WALK', 'DIANA'],
+  Knowledge: ['KNOWLEDGE', 'ACE', 'CAREER'],
 };
 
 /** XP needed to advance one attribute level. */

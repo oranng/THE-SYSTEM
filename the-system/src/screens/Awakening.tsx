@@ -25,9 +25,9 @@ const { width } = Dimensions.get('window');
 type Step = 'intro' | 'name' | 'class' | 'permissions' | 'accept';
 
 const CLASSES: { name: HeroClass; label: string; desc: string }[] = [
-  { name: 'Warrior', label: STAR_LABELS.Warrior, desc: 'Brightest in the night — a relentless, burning force' },
-  { name: 'Mage', label: STAR_LABELS.Mage, desc: 'The fixed north — steady guidance through any dark' },
-  { name: 'Rogue', label: STAR_LABELS.Rogue, desc: 'Swift-flying eagle star — quick, sharp, untethered' },
+  { name: 'Warrior', label: STAR_LABELS.Warrior, desc: 'Ярчайшая в ночи — неудержимая, пылающая сила' },
+  { name: 'Mage', label: STAR_LABELS.Mage, desc: 'Неподвижный север — твёрдый ориентир в любой тьме' },
+  { name: 'Rogue', label: STAR_LABELS.Rogue, desc: 'Звезда-орёл — быстрая, точная, свободная' },
 ];
 
 export default function Awakening() {
@@ -39,7 +39,7 @@ export default function Awakening() {
   const opacity = useRef(new Animated.Value(0)).current;
   const rise = useRef(new Animated.Value(12)).current;
 
-  const fullIntro = 'THE SYSTEM HAS DETECTED A CANDIDATE.';
+  const fullIntro = 'СИСТЕМА ОБНАРУЖИЛА КАНДИДАТА.';
 
   useEffect(() => {
     if (step !== 'intro') return;
@@ -65,14 +65,14 @@ export default function Awakening() {
         <TouchableOpacity style={styles.fullScreen} onPress={() => setStep('name')}>
           <Animated.View style={{ opacity, transform: [{ translateY: rise }] }}>
             <Text style={styles.introText}>{fullIntro}</Text>
-            <Text style={styles.tapHint}>Tap to continue</Text>
+            <Text style={styles.tapHint}>Нажми, чтобы продолжить</Text>
           </Animated.View>
         </TouchableOpacity>
       )}
 
       {step === 'name' && (
         <View style={styles.section}>
-          <Text style={styles.prompt}>IDENTIFY YOURSELF.</Text>
+          <Text style={styles.prompt}>НАЗОВИ СЕБЯ.</Text>
           <View style={styles.inputWrap}>
             <TextInput
               style={styles.input}
@@ -87,14 +87,14 @@ export default function Awakening() {
             style={styles.goldBtn}
             onPress={() => name.trim() && setStep('class')}
           >
-            <Text style={styles.goldBtnText}>Confirm</Text>
+            <Text style={styles.goldBtnText}>Подтвердить</Text>
           </TouchableOpacity>
         </View>
       )}
 
       {step === 'class' && (
         <View style={styles.section}>
-          <Text style={styles.prompt}>SELECT YOUR STAR.</Text>
+          <Text style={styles.prompt}>ВЫБЕРИ СВОЮ ЗВЕЗДУ.</Text>
           {CLASSES.map((c) => (
             <TouchableOpacity
               key={c.name}
@@ -119,7 +119,7 @@ export default function Awakening() {
               style={styles.goldBtn}
               onPress={() => setStep('permissions')}
             >
-              <Text style={styles.goldBtnText}>Confirm</Text>
+              <Text style={styles.goldBtnText}>Подтвердить</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -128,7 +128,7 @@ export default function Awakening() {
       {step === 'permissions' && (
         <View style={styles.section}>
           <Text style={styles.prompt}>
-            THE SYSTEM REQUIRES CERTAIN PERMISSIONS TO ENFORCE YOUR COVENANT.
+            СИСТЕМЕ НУЖНЫ РАЗРЕШЕНИЯ, ЧТОБЫ СЛЕДИТЬ ЗА ИСПОЛНЕНИЕМ ТВОЕГО ДОГОВОРА.
           </Text>
           <TouchableOpacity
             style={styles.permBtn}
@@ -137,26 +137,26 @@ export default function Awakening() {
             }}
           >
             <CornerBrackets color="#333" />
-            <Text style={styles.permBtnText}>Grant notifications</Text>
-            <Text style={styles.permDesc}>Required to deliver system mandates.</Text>
+            <Text style={styles.permBtnText}>Разрешить уведомления</Text>
+            <Text style={styles.permDesc}>Нужно, чтобы Система могла напоминать о заданиях.</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.goldBtn, { marginTop: 24 }]}
             onPress={() => setStep('accept')}
           >
-            <Text style={styles.goldBtnText}>Continue</Text>
+            <Text style={styles.goldBtnText}>Продолжить</Text>
           </TouchableOpacity>
         </View>
       )}
 
       {step === 'accept' && (
         <View style={styles.section}>
-          <Text style={styles.prompt}>YOUR COVENANT BEGINS.</Text>
+          <Text style={styles.prompt}>ТВОЙ ДОГОВОР НАЧИНАЕТСЯ.</Text>
           <Text style={styles.dateText}>
             {format(new Date(), 'yyyy-MM-dd')}
           </Text>
           <TouchableOpacity style={styles.goldBtn} onPress={handleAccept}>
-            <Text style={styles.goldBtnText}>I accept</Text>
+            <Text style={styles.goldBtnText}>Я принимаю</Text>
           </TouchableOpacity>
         </View>
       )}

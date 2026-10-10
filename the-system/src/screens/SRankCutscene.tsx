@@ -12,12 +12,12 @@ import { FONTS } from '../theme/typography';
 const { width, height } = Dimensions.get('window');
 
 const FRAMES = [
-  { title: 'FRAME I', text: 'THE SYSTEM HAS RENDERED\nITS VERDICT.', scene: 'standing' },
-  { title: 'FRAME II', text: 'SIX MONTHS.\nNOT A SINGLE DAY WASTED.', scene: 'light_descends' },
-  { title: 'FRAME III', text: 'THE IRON TEMPLE\nHAS MADE YOU UNBREAKABLE.', scene: 'wings_spread' },
-  { title: 'FRAME IV', text: 'SILENCE HAS BEEN HELD.\nTHE MIND IS SOVEREIGN.', scene: 'crown_descends' },
-  { title: 'FRAME V', text: 'YOU ARE NO LONGER\nWHO YOU WERE.', scene: 'full_glow' },
-  { title: 'FRAME VI', text: 'RAYNALD ARVAN LIM.\nYOU ARE TRANSCENDENT.', scene: 'transcendent' },
+  { title: 'КАДР I', text: 'СИСТЕМА\nВЫНЕСЛА ВЕРДИКТ.', scene: 'standing' },
+  { title: 'КАДР II', text: 'ШЕСТЬ МЕСЯЦЕВ.\nНИ ОДНОГО ПОТЕРЯННОГО ДНЯ.', scene: 'light_descends' },
+  { title: 'КАДР III', text: 'ЖЕЛЕЗНЫЙ ХРАМ\nЗАКАЛИЛ ТВОЮ ВОЛЮ.', scene: 'wings_spread' },
+  { title: 'КАДР IV', text: 'ТИШИНА СОХРАНЕНА.\nРАЗУМ СВОБОДЕН.', scene: 'crown_descends' },
+  { title: 'КАДР V', text: 'ПРЕЖНЕЙ ВЕРСИИ\nТЕБЯ БОЛЬШЕ НЕТ.', scene: 'full_glow' },
+  { title: 'КАДР VI', text: 'ТВОЙ РАНГ —\nПРЕВОСХОЖДЕНИЕ.', scene: 'transcendent' },
 ];
 
 function SceneStanding() {
@@ -116,7 +116,7 @@ const SCENE_COMPONENTS = [
 
 export default function SRankCutscene() {
   const navigation = useNavigation<{ goBack: () => void }>();
-  const { refresh } = useSystemStore();
+  const { refresh, hero } = useSystemStore();
   const [frameIndex, setFrameIndex] = useState(0);
   const [finished, setFinished] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -158,15 +158,15 @@ export default function SRankCutscene() {
     return (
       <View style={styles.container}>
         <Animated.View style={[styles.content, { opacity: glowAnim }]}>
-          <Text style={styles.finalTitle}>S-RANK</Text>
-          <Text style={styles.finalSubtitle}>THE TRANSCENDENT</Text>
+          <Text style={styles.finalTitle}>РАНГ S</Text>
+          <Text style={styles.finalSubtitle}>ПРЕВОСХОЖДЕНИЕ</Text>
         </Animated.View>
         <Text style={styles.finalText}>
-          {'RAYNALD ARVAN LIM.\nTHE SYSTEM HAS RENDERED ITS VERDICT.\nYOU ARE TRANSCENDENT.'}
+          {`${(hero?.name ?? '').toUpperCase()}.\nСИСТЕМА ВЫНЕСЛА ВЕРДИКТ.\nТВОЙ РАНГ — ПРЕВОСХОЖДЕНИЕ.`}
         </Text>
         <TouchableOpacity style={styles.completeBtn} onPress={handleComplete}>
           <CornerBrackets color="#ffd700" />
-          <Text style={styles.completeBtnText}>Accept your destiny</Text>
+          <Text style={styles.completeBtnText}>Принять судьбу</Text>
         </TouchableOpacity>
       </View>
     );
@@ -181,7 +181,7 @@ export default function SRankCutscene() {
         </View>
         <Text style={styles.frameText}>{frame.text}</Text>
         <Text style={styles.tapHint}>
-          {frameIndex < FRAMES.length - 1 ? 'Tap to continue' : 'Tap to finish'}
+          {frameIndex < FRAMES.length - 1 ? 'Нажми, чтобы продолжить' : 'Нажми, чтобы завершить'}
         </Text>
         <View style={styles.dotRow}>
           {FRAMES.map((_, i) => (

@@ -17,38 +17,38 @@ import { FONTS } from '../theme/typography';
 const TOTAL_NODES = 24;
 
 const ZONE_LABELS = [
-  'The Abyss', 'Ruined Kingdom', 'Iron Citadel',
-  'Celestial Gate', 'Void Expanse', 'The Throne',
+  'Бездна', 'Павшее королевство', 'Железная цитадель',
+  'Небесные врата', 'Пустота', 'Трон',
 ];
 
 // Warm charcoal zone tints — deep at the start, warming toward the throne.
 const ZONE_TINTS = ['#201F1D', '#23211E', '#262320', '#2A2622', '#2E2823', '#332B24'];
 
 const LORE: string[] = [
-  'Week 1: The descent begins. You carry nothing but will.',
-  'Week 2: The abyss walls press close. You press back.',
-  'Week 3: Light fades. You become the light.',
-  'Week 4: The surface. You have earned the sun.',
-  'Week 5: Ruins stretch before you. Others fell here.',
-  'Week 6: You walk where kingdoms died.',
-  'Week 7: Bronze ashes. Your path is different.',
-  'Week 8: The forge still burns. You step in.',
-  'Week 9: Iron sky. Iron will. One remains.',
-  'Week 10: Storm reveals character. Storm passes.',
-  'Week 11: The citadel walls. You built them.',
-  'Week 12: The peak. Everything looks small from here.',
-  'Week 13: The clouds part. You were above this.',
-  'Week 14: Gates of the celestial plane open.',
-  'Week 15: You were expected.',
-  'Week 16: The throne room has been waiting.',
-  'Week 17: Stars. The System reveals its scope.',
-  'Week 18: Constellations form in your name.',
-  'Week 19: The void between stars. You cross it.',
-  'Week 20: Light bends around you now.',
-  'Week 21: The final path. Each step is legend.',
-  'Week 22: The System marks your approach.',
-  'Week 23: One wall remains. The last.',
-  'Week 24: The divine throne. You have arrived.',
+  'Неделя 1: спуск начинается. С собой только воля.',
+  'Неделя 2: стены бездны давят. Ты давишь в ответ.',
+  'Неделя 3: свет гаснет. Свет теперь — ты.',
+  'Неделя 4: поверхность. Солнце заслужено.',
+  'Неделя 5: впереди руины. Здесь пали другие.',
+  'Неделя 6: ты идёшь там, где умирали королевства.',
+  'Неделя 7: бронзовый пепел. Твой путь — другой.',
+  'Неделя 8: кузня ещё горит. Шаг внутрь.',
+  'Неделя 9: железное небо. Железная воля. Остаётся один.',
+  'Неделя 10: буря показывает характер. Буря проходит.',
+  'Неделя 11: стены цитадели. Их строишь ты.',
+  'Неделя 12: вершина. Отсюда всё кажется мелким.',
+  'Неделя 13: облака расходятся. Ты выше этого.',
+  'Неделя 14: врата небесного плана открыты.',
+  'Неделя 15: тебя ждали.',
+  'Неделя 16: тронный зал давно ждёт.',
+  'Неделя 17: звёзды. Система раскрывает свой масштаб.',
+  'Неделя 18: созвездия складываются в твоё имя.',
+  'Неделя 19: пустота между звёздами. Ты пересекаешь её.',
+  'Неделя 20: теперь свет огибает тебя.',
+  'Неделя 21: последний путь. Каждый шаг — легенда.',
+  'Неделя 22: Система отмечает твоё приближение.',
+  'Неделя 23: осталась одна стена. Последняя.',
+  'Неделя 24: божественный трон. Цель достигнута.',
 ];
 
 const { width } = Dimensions.get('window');
@@ -134,7 +134,7 @@ function NodeRow({ nodeNum, completionRate, isCurrent, isLocked, onPress, theme 
         <View style={styles.nodeCol}>
           <TrailNode state={state} color={theme.accent} pulseAnim={pulseAnim} />
           <Text style={[styles.nodeCaption, { color: captionColor }]}>
-            {isLocked ? `Week ${nodeNum}` : `Week ${nodeNum} · ${pct}%`}
+            {isLocked ? `Неделя ${nodeNum}` : `Неделя ${nodeNum} · ${pct}%`}
           </Text>
         </View>
       </TouchableOpacity>
@@ -179,7 +179,7 @@ export default function AscensionPath() {
       {/* Header */}
       <View style={[styles.header, { borderBottomColor: theme.accent + '30', paddingTop: insets.top + 10 }]}>
         <View style={styles.headerTop}>
-          <Text style={[styles.title, { color: theme.text }]}>Ascension path</Text>
+          <Text style={[styles.title, { color: theme.text }]}>Путь восхождения</Text>
           <View style={[styles.weekBadge, { borderColor: theme.accent + '70', backgroundColor: theme.accent + '12' }]}>
             <CornerBrackets color={theme.accent + '70'} length={8} />
             <Text style={[styles.weekNum, { color: theme.accent }]}>{currentWeek}</Text>
@@ -194,7 +194,7 @@ export default function AscensionPath() {
             }]} />
           </View>
           <Text style={[styles.headerPct, { color: theme.textSecondary }]}>
-            {Math.round(overallRate * 100)}% avg
+            в среднем {Math.round(overallRate * 100)}%
           </Text>
         </View>
       </View>
@@ -270,7 +270,7 @@ export default function AscensionPath() {
             <TouchableOpacity activeOpacity={1} style={styles.modalInner}>
               <View style={styles.modalTopRow}>
                 <Text style={[styles.modalWeek, { color: theme.accent }]}>
-                  Week {selectedNode}
+                  Неделя {selectedNode}
                 </Text>
                 <Text style={[styles.modalZone, { color: theme.textSecondary }]}>
                   {ZONE_LABELS[zoneIdx] ?? ''}
@@ -289,14 +289,14 @@ export default function AscensionPath() {
                   <Text style={[styles.modalStatVal, { color: theme.accent }]}>
                     {Math.round(selectedRate * 100)}%
                   </Text>
-                  <Text style={[styles.modalStatLabel, { color: theme.textSecondary }]}>Completion</Text>
+                  <Text style={[styles.modalStatLabel, { color: theme.textSecondary }]}>Выполнено</Text>
                 </View>
                 <View style={[styles.modalStatBox, { borderColor: theme.accent + '50' }]}>
                   <CornerBrackets color={theme.accent + '50'} />
                   <Text style={[styles.modalStatVal, { color: selectedNode === currentWeek ? theme.accent : theme.textSecondary }]}>
-                    {selectedNode === currentWeek ? 'Now' : selectedNode !== null && selectedNode > currentWeek ? 'Locked' : 'Done'}
+                    {selectedNode === currentWeek ? 'Сейчас' : selectedNode !== null && selectedNode > currentWeek ? 'Закрыто' : 'Пройдено'}
                   </Text>
-                  <Text style={[styles.modalStatLabel, { color: theme.textSecondary }]}>Status</Text>
+                  <Text style={[styles.modalStatLabel, { color: theme.textSecondary }]}>Статус</Text>
                 </View>
               </View>
 
@@ -305,7 +305,7 @@ export default function AscensionPath() {
                 onPress={() => setSelectedNode(null)}
               >
                 <CornerBrackets color={theme.accent + '70'} />
-                <Text style={[styles.modalCloseTxt, { color: theme.accent }]}>Close</Text>
+                <Text style={[styles.modalCloseTxt, { color: theme.accent }]}>Закрыть</Text>
               </TouchableOpacity>
             </TouchableOpacity>
           </CornerFrame>

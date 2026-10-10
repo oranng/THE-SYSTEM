@@ -28,7 +28,7 @@ export default function XPBar() {
   const nextLevelXP = getXpForLevel(hero.global_level + 1);
 
   let progress = 1;
-  let xpLabel = 'MAX';
+  let xpLabel = 'МАКС';
   if (nextLevelXP !== null) {
     const range = nextLevelXP - currentLevelXP;
     const earned = currentXP - currentLevelXP;
@@ -44,7 +44,7 @@ export default function XPBar() {
         {/* Level badge */}
         <View style={[styles.levelBadge, { borderColor: theme.accent + 'aa' }]}>
           <CornerBrackets color={theme.accent + 'aa'} length={8} />
-          <Text style={[styles.lvlLabel, { color: theme.textSecondary }]}>LVL</Text>
+          <Text style={[styles.lvlLabel, { color: theme.textSecondary }]}>УР.</Text>
           <Text style={[styles.lvlNum, { color: theme.accent }]}>{hero.global_level}</Text>
         </View>
 
@@ -78,7 +78,7 @@ export default function XPBar() {
         </View>
 
         {/* XP text */}
-        <Text style={[styles.xpText, { color: theme.textSecondary }]}>{xpLabel} XP</Text>
+        <Text style={[styles.xpText, { color: theme.textSecondary }]}>{xpLabel} опыта</Text>
       </View>
     </View>
   );

@@ -21,6 +21,7 @@ import { CornerBrackets } from '../components/ui/CornerBox';
 import Glyph, { GlyphName } from '../components/icons/Glyph';
 import type { HeroClass } from '../components/avatar/avatarData';
 import { FONTS } from '../theme/typography';
+import { ATTRIBUTE_LABELS, MOOD_LABELS } from '../i18n/labels';
 
 type MoodState = 'radiant' | 'steady' | 'worn' | 'broken';
 
@@ -58,7 +59,7 @@ function StatBar({ label, glyph, progress, color }: {
           {progress.xpIntoLevel}/{progress.xpForLevel} XP
         </Text>
       </View>
-      <Text style={[statStyles.lvl, { color }]}>L{progress.level}</Text>
+      <Text style={[statStyles.lvl, { color }]}>У{progress.level}</Text>
     </View>
   );
 }
@@ -181,27 +182,27 @@ export default function Mirror() {
           <View style={[styles.moodBadge, { borderColor: theme.accent + '60', backgroundColor: theme.primary }]}>
             <CornerBrackets color={theme.accent + '60'} length={8} />
             <Text style={[styles.moodText, { color: theme.accent }]}>
-              {mood.charAt(0).toUpperCase() + mood.slice(1)}
+              {MOOD_LABELS[mood] ?? mood}
             </Text>
           </View>
         </View>
 
         {/* Equipment */}
-        <SectionDivider title="Equipment" color={theme.accent} />
+        <SectionDivider title="Снаряжение" color={theme.accent} />
         <View style={styles.equipRow}>
-          <EquipSlot label="Weapon" name={equippedWeapon?.name ?? 'None'} tier={equippedWeapon?.tier ?? 1} color={theme.accent} />
-          <EquipSlot label="Armor" name={equippedArmor?.name ?? 'None'} tier={equippedArmor?.tier ?? 1} color={theme.accent} />
-          <EquipSlot label="Crown" name={equippedCrown?.name ?? 'None'} tier={equippedCrown?.tier ?? 1} color={theme.accent} />
-          <EquipSlot label="Charm" name={equippedAccessory?.name ?? 'None'} tier={equippedAccessory?.tier ?? 1} color={theme.accent} />
+          <EquipSlot label="Оружие" name={equippedWeapon?.name ?? 'Нет'} tier={equippedWeapon?.tier ?? 1} color={theme.accent} />
+          <EquipSlot label="Броня" name={equippedArmor?.name ?? 'Нет'} tier={equippedArmor?.tier ?? 1} color={theme.accent} />
+          <EquipSlot label="Корона" name={equippedCrown?.name ?? 'Нет'} tier={equippedCrown?.tier ?? 1} color={theme.accent} />
+          <EquipSlot label="Амулет" name={equippedAccessory?.name ?? 'Нет'} tier={equippedAccessory?.tier ?? 1} color={theme.accent} />
         </View>
 
         {/* Stats */}
-        <SectionDivider title="Attributes" color={theme.accent} />
+        <SectionDivider title="Характеристики" color={theme.accent} />
         <View style={styles.statsSection}>
           {ATTRIBUTES.map((attr) => (
             <StatBar
               key={attr}
-              label={attr}
+              label={ATTRIBUTE_LABELS[attr] ?? attr}
               glyph={ATTRIBUTE_GLYPHS[attr]}
               progress={attributes[attr]}
               color={theme.accent}
@@ -212,7 +213,7 @@ export default function Mirror() {
         {/* Titles */}
         {titles.length > 0 && (
           <>
-            <SectionDivider title="Titles" color={theme.accent} />
+            <SectionDivider title="Титулы" color={theme.accent} />
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.titlesRow} contentContainerStyle={styles.chipContent}>
               {titles.map((t) => (
                 <View key={t.id} style={[styles.titleChip, { borderColor: theme.accent + '70', backgroundColor: theme.accent + '10' }]}>
@@ -227,7 +228,7 @@ export default function Mirror() {
         {/* Auras (tap to equip — recolors embers + glow) */}
         {auras.length > 0 && (
           <>
-            <SectionDivider title="Auras" color={theme.accent} />
+            <SectionDivider title="Ауры" color={theme.accent} />
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.titlesRow} contentContainerStyle={styles.chipContent}>
               {auras.map((a) => (
                 <TouchableOpacity
@@ -251,7 +252,7 @@ export default function Mirror() {
         {/* Backgrounds (tap to equip — changes app background) */}
         {backgrounds.length > 0 && (
           <>
-            <SectionDivider title="Backgrounds" color={theme.accent} />
+            <SectionDivider title="Фоны" color={theme.accent} />
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.titlesRow} contentContainerStyle={styles.chipContent}>
               {backgrounds.map((b) => (
                 <TouchableOpacity

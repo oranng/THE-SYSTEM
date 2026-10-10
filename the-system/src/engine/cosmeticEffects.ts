@@ -10,18 +10,18 @@ import type { RankTheme } from '../theme/rankThemes';
 
 // Equipped background → app background colour (dark tints to stay readable).
 export const BACKGROUND_COLORS: Record<string, string> = {
-  'Volcanic Ruins': '#241715',
-  'Frozen Throne': '#141A24',
-  'Desert Citadel': '#241F15',
-  'Ocean Depths': '#102126',
+  'Вулканические руины': '#241715',
+  'Ледяной трон': '#141A24',
+  'Цитадель пустыни': '#241F15',
+  'Глубины океана': '#102126',
 };
 
 // Equipped aura → ember/glow colour.
 export const AURA_COLORS: Record<string, string> = {
-  'Crimson Aura': '#D9534F',
-  'Frost Aura': '#6CC6E0',
-  'Shadow Aura': '#9B8CCB',
-  'Divine Aura': '#F0C419',
+  'Багровая аура': '#D9534F',
+  'Морозная аура': '#6CC6E0',
+  'Теневая аура': '#9B8CCB',
+  'Божественная аура': '#F0C419',
 };
 
 /** Overlay equipped background/aura cosmetics onto a base rank theme. */

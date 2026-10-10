@@ -13,6 +13,7 @@ import CommandHall from '../screens/CommandHall';
 import AscensionPath from '../screens/AscensionPath';
 import Mirror from '../screens/Mirror';
 import Codex from '../screens/Codex';
+import Quests from '../screens/Quests';
 import Archive from '../screens/Archive';
 import Awakening from '../screens/Awakening';
 import MandateReveal from '../screens/MandateReveal';
@@ -69,6 +70,22 @@ function IconCommand({ color, focused }: { color: string; focused: boolean }) {
       <Star x={13} y={12} color={color} focused={focused} />
       <Star x={7} y={18} color={color} focused={focused} />
       <Star x={16} y={17} color={color} focused={focused} />
+    </Svg>
+  );
+}
+
+// Quests — sword constellation (blade, guard, hilt)
+function IconQuests({ color, focused }: { color: string; focused: boolean }) {
+  return (
+    <Svg width={22} height={22} viewBox="0 0 22 22">
+      {constLine(17, 3, 9, 13, color, focused, 'a')}
+      {constLine(6, 10, 12, 16, color, focused, 'b')}
+      {constLine(9, 13, 4, 18, color, focused, 'c')}
+      <Star x={17} y={3} color={color} focused={focused} big />
+      <Star x={6} y={10} color={color} focused={focused} />
+      <Star x={12} y={16} color={color} focused={focused} />
+      <Star x={9} y={13} color={color} focused={focused} />
+      <Star x={4} y={18} color={color} focused={focused} />
     </Svg>
   );
 }
@@ -183,15 +200,23 @@ function MainTabs() {
         name="CommandHall"
         component={CommandHall}
         options={{
-          tabBarLabel: 'Command',
+          tabBarLabel: 'Штаб',
           tabBarIcon: ({ focused, color }) => <IconCommand color={color} focused={focused} />,
+        }}
+      />
+      <Tab.Screen
+        name="Quests"
+        component={Quests}
+        options={{
+          tabBarLabel: 'Квесты',
+          tabBarIcon: ({ focused, color }) => <IconQuests color={color} focused={focused} />,
         }}
       />
       <Tab.Screen
         name="AscensionPath"
         component={AscensionPath}
         options={{
-          tabBarLabel: 'Ascend',
+          tabBarLabel: 'Путь',
           tabBarIcon: ({ focused, color }) => <IconAscend color={color} focused={focused} />,
         }}
       />
@@ -199,7 +224,7 @@ function MainTabs() {
         name="Mirror"
         component={Mirror}
         options={{
-          tabBarLabel: 'Mirror',
+          tabBarLabel: 'Зеркало',
           tabBarIcon: ({ focused, color }) => <IconMirror color={color} focused={focused} />,
         }}
       />
@@ -207,7 +232,7 @@ function MainTabs() {
         name="Codex"
         component={Codex}
         options={{
-          tabBarLabel: 'Codex',
+          tabBarLabel: 'Кодекс',
           tabBarIcon: ({ focused, color }) => <IconCodex color={color} focused={focused} />,
         }}
       />
@@ -215,7 +240,7 @@ function MainTabs() {
         name="Archive"
         component={Archive}
         options={{
-          tabBarLabel: 'Archive',
+          tabBarLabel: 'Архив',
           tabBarIcon: ({ focused, color }) => <IconArchive color={color} focused={focused} />,
         }}
       />
@@ -230,11 +255,11 @@ export default function AppNavigator() {
   if (!initialized) {
     return (
       <View style={styles.loading}>
-        <Text style={styles.loadingTitle}>THE SYSTEM</Text>
+        <Text style={styles.loadingTitle}>СИСТЕМА</Text>
         <View style={styles.loadingBar}>
           <View style={styles.loadingFill} />
         </View>
-        <Text style={styles.loadingSub}>Initializing…</Text>
+        <Text style={styles.loadingSub}>Загрузка…</Text>
       </View>
     );
   }

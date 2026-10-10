@@ -52,7 +52,7 @@ public class RichNotificationReceiver extends BroadcastReceiver {
 
         NotificationCompat.Builder b = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(smallIconId)
-                .setContentTitle(title != null ? title : "THE SYSTEM")
+                .setContentTitle(title != null ? title : "СИСТЕМА")
                 .setContentText(body)
                 .setColor(ACCENT)
                 .setColorized(true)
@@ -60,7 +60,7 @@ public class RichNotificationReceiver extends BroadcastReceiver {
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setContentIntent(contentPi)
-                .addAction(0, "Enter the System", contentPi)
+                .addAction(0, "Войти в Систему", contentPi)
                 .addAction(0, "I'm on it", contentPi);
 
         // Large icon = the player's transparent avatar (system masks it into the
@@ -92,7 +92,7 @@ public class RichNotificationReceiver extends BroadcastReceiver {
         if (nm == null) return;
         if (nm.getNotificationChannel(CHANNEL_ID) != null) return;
         NotificationChannel ch = new NotificationChannel(
-                CHANNEL_ID, "System Mandates", NotificationManager.IMPORTANCE_HIGH);
+                CHANNEL_ID, "Задания Системы", NotificationManager.IMPORTANCE_HIGH);
         ch.setLightColor(ACCENT);
         ch.enableVibration(true);
         ch.setVibrationPattern(new long[]{0, 250, 120, 250});

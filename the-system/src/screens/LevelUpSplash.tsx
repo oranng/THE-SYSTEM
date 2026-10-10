@@ -112,7 +112,7 @@ export default function LevelUpSplash() {
         <View style={styles.panelContent}>
           {rankChanged ? (
             <>
-              <Text style={[styles.eventLabel, { color: rankColor }]}>Rank ascension</Text>
+              <Text style={[styles.eventLabel, { color: rankColor }]}>Новый ранг</Text>
               <View style={[styles.rankDivider, { backgroundColor: rankColor + '50' }]} />
               <Animated.View style={[styles.bigLetterWrap, { transform: [{ scale: scaleAnim }] }]}>
                 <Animated.Text style={[styles.rankLetter, { color: rankColor, opacity: glowAnim }]}>
@@ -126,7 +126,7 @@ export default function LevelUpSplash() {
             </>
           ) : (
             <>
-              <Text style={[styles.eventLabel, { color: rankColor }]}>Level achieved</Text>
+              <Text style={[styles.eventLabel, { color: rankColor }]}>Уровень повышен</Text>
               <View style={[styles.rankDivider, { backgroundColor: rankColor + '50' }]} />
               <Animated.View style={[styles.bigLetterWrap, { transform: [{ scale: scaleAnim }] }]}>
                 <Animated.Text style={[styles.levelNumber, { color: rankColor, opacity: glowAnim }]}>
@@ -134,7 +134,7 @@ export default function LevelUpSplash() {
                 </Animated.Text>
               </Animated.View>
               <Text style={[styles.rankName, { color: theme.textSecondary }]}>
-                RANK {newRank} · LVL {level}
+                РАНГ {newRank} · УР. {level}
               </Text>
             </>
           )}
@@ -142,7 +142,7 @@ export default function LevelUpSplash() {
           <View style={styles.xpRow}>
             <View style={[styles.xpBadge, { borderColor: rankColor + '60' }]}>
               <CornerBrackets color={rankColor + '60'} length={8} />
-              <Text style={[styles.xpText, { color: rankColor }]}>+{xpGained} XP</Text>
+              <Text style={[styles.xpText, { color: rankColor }]}>+{xpGained} опыта</Text>
             </View>
           </View>
 
@@ -152,7 +152,7 @@ export default function LevelUpSplash() {
             activeOpacity={0.8}
           >
             <CornerBrackets color={rankColor} thickness={1} length={8} />
-            <Text style={[styles.continueTxt, { color: rankColor }]}>Continue</Text>
+            <Text style={[styles.continueTxt, { color: rankColor }]}>Продолжить</Text>
           </TouchableOpacity>
         </View>
       </Animated.View>

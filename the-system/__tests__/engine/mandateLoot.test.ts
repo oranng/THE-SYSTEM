@@ -9,20 +9,20 @@ describe('lootToCosmetic', () => {
     expect(map('scroll', 'Some quote')).toBeNull();
   });
   it('maps titles', () => {
-    expect(map('title', 'Iron Will')).toEqual({ type: 'title', tier: 1, name: 'Iron Will' });
+    expect(map('title', 'Железная воля')).toEqual({ type: 'title', tier: 1, name: 'Железная воля' });
   });
   it('maps weapon vs armor skins from cosmetic_variant', () => {
-    expect(map('cosmetic_variant', 'Weapon Skin: Crimson')).toEqual({ type: 'weapon', tier: 2, name: 'Weapon Skin: Crimson' });
-    expect(map('cosmetic_variant', 'Armor Skin: Shadow')).toEqual({ type: 'armor', tier: 2, name: 'Armor Skin: Shadow' });
+    expect(map('cosmetic_variant', 'Оружие: багровый облик')).toEqual({ type: 'weapon', tier: 2, name: 'Оружие: багровый облик' });
+    expect(map('cosmetic_variant', 'Броня: теневой облик')).toEqual({ type: 'armor', tier: 2, name: 'Броня: теневой облик' });
   });
   it('maps equipment_tier to tier 3 weapon/armor/crown', () => {
-    expect(map('equipment_tier', 'Weapon Tier Unlock')?.tier).toBe(3);
-    expect(map('equipment_tier', 'Armor Tier Unlock')?.type).toBe('armor');
-    expect(map('equipment_tier', 'Crown of Ascension')?.type).toBe('crown');
+    expect(map('equipment_tier', 'Оружие: новый ранг')?.tier).toBe(3);
+    expect(map('equipment_tier', 'Броня: новый ранг')?.type).toBe('armor');
+    expect(map('equipment_tier', 'Корона восхождения')?.type).toBe('crown');
   });
   it('maps aura_variant to aura, accessory to accessory', () => {
-    expect(map('aura_variant', 'Frost Aura')?.type).toBe('aura');
-    expect(map('accessory', 'War Paint')?.type).toBe('accessory');
+    expect(map('aura_variant', 'Морозная аура')?.type).toBe('aura');
+    expect(map('accessory', 'Боевая раскраска')?.type).toBe('accessory');
   });
 });
 
@@ -51,7 +51,7 @@ describe('openCurrentMandate persists loot', () => {
   });
 
   it('does not store duplicate loot of the same type+name', async () => {
-    const spy = jest.spyOn(Math, 'random').mockReturnValue(0); // always Weapon Skin: Crimson
+    const spy = jest.spyOn(Math, 'random').mockReturnValue(0); // always Оружие: багровый облик
     try {
       await createMandate('SILVER');
       await openCurrentMandate();
@@ -60,7 +60,7 @@ describe('openCurrentMandate persists loot', () => {
     } finally {
       spy.mockRestore();
     }
-    const weapons = (await getCosmetics()).filter((c) => c.type === 'weapon' && c.name === 'Weapon Skin: Crimson');
+    const weapons = (await getCosmetics()).filter((c) => c.type === 'weapon' && c.name === 'Оружие: багровый облик');
     expect(weapons).toHaveLength(1);
   });
 
@@ -70,7 +70,7 @@ describe('openCurrentMandate persists loot', () => {
     await equipCosmetic(lowId, 'weapon');
 
     // Force SILVER → cosmetic_variant (weight 0.5, first entry) → item index 0
-    // = 'Weapon Skin: Crimson' → weapon tier 2.
+    // = 'Оружие: багровый облик' → weapon tier 2.
     const spy = jest.spyOn(Math, 'random').mockReturnValue(0);
     try {
       await createMandate('SILVER');
@@ -82,7 +82,7 @@ describe('openCurrentMandate persists loot', () => {
     const equipped = await getEquippedCosmetics();
     const weapon = equipped.find((c) => c.type === 'weapon');
     expect(weapon?.tier).toBe(2);
-    expect(weapon?.name).toBe('Weapon Skin: Crimson');
+    expect(weapon?.name).toBe('Оружие: багровый облик');
     // only one weapon may be equipped at a time
     expect(equipped.filter((c) => c.type === 'weapon')).toHaveLength(1);
   });

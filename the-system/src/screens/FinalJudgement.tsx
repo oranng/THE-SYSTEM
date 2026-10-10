@@ -10,11 +10,11 @@ const { width } = Dimensions.get('window');
 
 // Verdict tiers by 180-day consistency rate (% of all logged trials completed).
 function verdict(rate: number): { title: string; line: string; color: string } {
-  if (rate >= 85) return { title: 'THE TRANSCENDENT', line: 'You did not walk the path. You became it.', color: '#F0C419' };
-  if (rate >= 70) return { title: 'THE SOVEREIGN', line: 'You ruled your days. The System bows.', color: '#E0C060' };
-  if (rate >= 50) return { title: 'THE FORGED', line: 'The fire held. You held harder.', color: '#D97757' };
-  if (rate >= 30) return { title: 'THE TESTED', line: 'You were tried. You remained.', color: '#9CA77F' };
-  return { title: 'THE UNREALIZED', line: 'The journey ends — the work does not.', color: '#8A7A6B' };
+  if (rate >= 85) return { title: 'ПРЕВОСХОЖДЕНИЕ', line: 'Это был не просто путь. Путь стал тобой.', color: '#F0C419' };
+  if (rate >= 70) return { title: 'ВЛАДЫЧЕСТВО', line: 'Твои дни подчинялись тебе. Система склоняется.', color: '#E0C060' };
+  if (rate >= 50) return { title: 'ЗАКАЛКА', line: 'Огонь не гас. Твоя хватка была крепче.', color: '#D97757' };
+  if (rate >= 30) return { title: 'ИСПЫТАНИЕ', line: 'Испытания пройдены. Ты всё ещё здесь.', color: '#9CA77F' };
+  return { title: 'НЕРАСКРЫТОЕ', line: 'Путь окончен, но работа — нет.', color: '#8A7A6B' };
 }
 
 export default function FinalJudgement() {
@@ -41,12 +41,12 @@ export default function FinalJudgement() {
     <View style={styles.overlay}>
       <Animated.View style={[styles.panel, { width: panelSize, opacity: fade, transform: [{ scale }] }]}>
         <CornerBrackets color={v.color} thickness={2} length={22} />
-        <Text style={[styles.eyebrow, { color: v.color }]}>The Final Judgement</Text>
+        <Text style={[styles.eyebrow, { color: v.color }]}>Последний суд</Text>
         <View style={[styles.divider, { backgroundColor: v.color + '50' }]} />
-        <Text style={[styles.days, { color: '#fff' }]}>180 DAYS</Text>
+        <Text style={[styles.days, { color: '#fff' }]}>180 ДНЕЙ</Text>
         <Text style={[styles.verdict, { color: v.color }]}>{v.title}</Text>
         <Text style={[styles.rate, { color: v.color }]}>{r}%</Text>
-        <Text style={[styles.rateLabel, { color: '#888' }]}>consistency</Text>
+        <Text style={[styles.rateLabel, { color: '#888' }]}>постоянство</Text>
         <Text style={[styles.line, { color: '#cfcabf' }]}>{v.line}</Text>
         {hero?.name ? <Text style={[styles.name, { color: '#888' }]}>— {hero.name}</Text> : null}
         <TouchableOpacity
@@ -55,7 +55,7 @@ export default function FinalJudgement() {
           activeOpacity={0.8}
         >
           <CornerBrackets color={v.color} length={8} />
-          <Text style={[styles.btnTxt, { color: v.color }]}>Accept the verdict</Text>
+          <Text style={[styles.btnTxt, { color: v.color }]}>Принять вердикт</Text>
         </TouchableOpacity>
       </Animated.View>
     </View>

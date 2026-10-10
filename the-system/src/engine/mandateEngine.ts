@@ -24,47 +24,47 @@ export interface LootResult {
 }
 
 const SCROLLS = [
-  'The man who moves a mountain begins by carrying small stones.',
-  'Your discipline today is your freedom tomorrow.',
-  'The forge does not ask if you are ready. It only asks if you will step in.',
-  'Weakness is a choice. So is strength.',
-  'You are not built in the moments of ease. You are built in the fire.',
-  'The System sees what others cannot: your potential.',
-  'Every sunrise you claim is a victory against your former self.',
-  'Silence is not absence. It is mastery.',
-  'The iron remembers every rep. So does your future.',
-  'A king is not crowned. He crowns himself through daily conquest.',
-  'The scroll opens for those who seek. You sought. You found.',
-  'Consistency is the throne upon which greatness sits.',
-  'The night belongs to those who earned their rest.',
-  'Your covenant is not with others. It is with yourself.',
-  'When the world sleeps, the disciplined rise.',
-  'There is no shortcut to the summit. Only steps.',
-  'The System does not judge your past. Only your present.',
-  'What you resist today becomes what you conquer tomorrow.',
-  'An empire is built one disciplined day at a time.',
-  'You were not chosen at random. The System sees your fire.',
+  'Тот, кто сдвигает гору, начинает с переноски маленьких камней.',
+  'Твоя дисциплина сегодня — твоя свобода завтра.',
+  'Кузня не спрашивает, готов ли ты. Она спрашивает, войдёшь ли.',
+  'Слабость — это выбор. Сила — тоже.',
+  'Характер куётся не в моменты лёгкости, а в огне.',
+  'Система видит то, чего не видят другие: твой потенциал.',
+  'Каждый отвоёванный рассвет — победа над прежней версией себя.',
+  'Тишина — не пустота. Это мастерство.',
+  'Железо помнит каждый повтор. Твоё будущее — тоже.',
+  'Короны не дарят. Их добывают ежедневной победой.',
+  'Свиток открывается тем, кто ищет.',
+  'Постоянство — трон, на котором восседает величие.',
+  'Ночь принадлежит тем, кто заслужил отдых.',
+  'Твой договор — не с другими. Он с тобой.',
+  'Когда мир спит, дисциплина встаёт.',
+  'К вершине нет короткой дороги. Только шаги.',
+  'Система не судит твоё прошлое. Только настоящее.',
+  'То, чему сопротивляешься сегодня, завтра станет твоей победой.',
+  'Империя строится по одному дисциплинированному дню.',
+  'Тебя выбрали не случайно. Система видит твой огонь.',
 ];
 
 const TITLES_COMMON = [
-  'Stone Breaker', 'Dawn Riser', 'Iron Will', 'Night Watcher',
-  'Path Walker', 'Ember Keeper', 'Dust Shaker', 'Oath Bound',
-  'Grit Bearer', 'Steel Minded',
+  'Крушитель камней', 'Встречающий рассвет', 'Железная воля', 'Ночной страж',
+  'Идущий путём', 'Хранитель углей', 'Стряхнувший пыль', 'Связанный клятвой',
+  'Носитель стойкости', 'Стальной разум',
 ];
 
 const TITLES_RARE = [
-  'Shadow Conqueror', 'Flame Forged', 'Crown Seeker',
-  'Void Walker', 'Storm Bringer',
+  'Покоритель теней', 'Закалённый пламенем', 'Искатель короны',
+  'Странник пустоты', 'Несущий бурю',
 ];
 
 const TITLES_LEGENDARY = [
-  'The Sovereign', 'Chosen of the System', 'The Unbroken',
-  'Divine Will', 'The Transcendent',
+  'Владыка', 'Избранник Системы', 'Несломленная воля',
+  'Божественная воля', 'Превосхождение',
 ];
 
 const ACCESSORIES = [
-  'Battle Scar', 'Iron Earring', 'War Paint', 'Pixel Tattoo',
-  'Eye Patch', 'Chain Pendant',
+  'Боевой шрам', 'Железная серьга', 'Боевая раскраска', 'Пиксельная татуировка',
+  'Повязка на глаз', 'Цепной кулон',
 ];
 
 export const LOOT_TABLES: Record<string, LootEntry[]> = {
@@ -74,13 +74,13 @@ export const LOOT_TABLES: Record<string, LootEntry[]> = {
     { type: 'accessory', weight: 0.1, items: ACCESSORIES },
   ],
   SILVER: [
-    { type: 'cosmetic_variant', weight: 0.5, items: ['Weapon Skin: Crimson', 'Weapon Skin: Frost', 'Armor Skin: Shadow', 'Armor Skin: Bronze'] },
-    { type: 'background', weight: 0.3, items: ['Volcanic Ruins', 'Frozen Throne', 'Desert Citadel', 'Ocean Depths'] },
+    { type: 'cosmetic_variant', weight: 0.5, items: ['Оружие: багровый облик', 'Оружие: морозный облик', 'Броня: теневой облик', 'Броня: бронзовый облик'] },
+    { type: 'background', weight: 0.3, items: ['Вулканические руины', 'Ледяной трон', 'Цитадель пустыни', 'Глубины океана'] },
     { type: 'title', weight: 0.2, items: TITLES_RARE },
   ],
   GOLD: [
-    { type: 'equipment_tier', weight: 0.4, items: ['Weapon Tier Unlock', 'Armor Tier Unlock', 'Crown of Ascension'] },
-    { type: 'aura_variant', weight: 0.4, items: ['Crimson Aura', 'Frost Aura', 'Shadow Aura', 'Divine Aura'] },
+    { type: 'equipment_tier', weight: 0.4, items: ['Оружие: новый ранг', 'Броня: новый ранг', 'Корона восхождения'] },
+    { type: 'aura_variant', weight: 0.4, items: ['Багровая аура', 'Морозная аура', 'Теневая аура', 'Божественная аура'] },
     { type: 'title', weight: 0.2, items: TITLES_LEGENDARY },
   ],
 };
@@ -131,11 +131,11 @@ export function lootToCosmetic(loot: LootResult): MappedCosmetic | null {
     case 'background':
       return { type: 'background', tier: 1, name: loot.name };
     case 'cosmetic_variant':
-      if (loot.name.startsWith('Armor')) return { type: 'armor', tier: 2, name: loot.name };
+      if (loot.name.startsWith('Броня')) return { type: 'armor', tier: 2, name: loot.name };
       return { type: 'weapon', tier: 2, name: loot.name };
     case 'equipment_tier':
-      if (loot.name.startsWith('Armor')) return { type: 'armor', tier: 3, name: loot.name };
-      if (loot.name.startsWith('Crown')) return { type: 'crown', tier: 3, name: loot.name };
+      if (loot.name.startsWith('Броня')) return { type: 'armor', tier: 3, name: loot.name };
+      if (loot.name.startsWith('Корона')) return { type: 'crown', tier: 3, name: loot.name };
       return { type: 'weapon', tier: 3, name: loot.name };
     default:
       return { type: 'accessory', tier: 1, name: loot.name };

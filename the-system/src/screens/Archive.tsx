@@ -22,10 +22,10 @@ import { FONTS } from '../theme/typography';
 type Tab = 'overview' | 'disciplines' | 'streaks' | 'history';
 
 const TAB_LABELS: Record<Tab, string> = {
-  overview: 'Overview',
-  disciplines: 'Missions',
-  streaks: 'Streaks',
-  history: 'History',
+  overview: 'Обзор',
+  disciplines: 'Испытания',
+  streaks: 'Серии',
+  history: 'История',
 };
 
 function HeatCell({ completed, failed, future }: { completed: boolean; failed: boolean; future: boolean }) {
@@ -139,8 +139,8 @@ export default function Archive() {
       <AmbientEmbers color={theme.auraColor ?? theme.accent} />
       {/* Header */}
       <View style={[styles.header, { borderBottomColor: theme.accent + '30' }]}>
-        <Text style={[styles.title, { color: theme.text }]}>The Archive</Text>
-        <Text style={[styles.subtitle, { color: theme.textSecondary }]}>Record of becoming</Text>
+        <Text style={[styles.title, { color: theme.text }]}>Архив</Text>
+        <Text style={[styles.subtitle, { color: theme.textSecondary }]}>Летопись становления</Text>
       </View>
 
       {/* Tab bar */}
@@ -173,14 +173,14 @@ export default function Archive() {
         {/* ── OVERVIEW ── */}
         {activeTab === 'overview' && (
           <View style={styles.section}>
-            <SectionDivider title="Journey" color={theme.accent} style={styles.firstDivider} />
+            <SectionDivider title="Путь" color={theme.accent} style={styles.firstDivider} />
 
             {/* Progress bar */}
             <CornerFrame color={theme.accent + '50'} size={8} thickness={1} style={styles.journeyWrap}>
               <View style={styles.journeyInner}>
                 <View style={styles.journeyTopRow}>
-                  <Text style={[styles.journeyDay, { color: theme.accent }]}>DAY {daysElapsed}</Text>
-                  <Text style={[styles.journeyOf, { color: theme.textSecondary }]}>OF 180</Text>
+                  <Text style={[styles.journeyDay, { color: theme.accent }]}>ДЕНЬ {daysElapsed}</Text>
+                  <Text style={[styles.journeyOf, { color: theme.textSecondary }]}>ИЗ 180</Text>
                 </View>
                 <View style={[styles.journeyBg, { backgroundColor: '#111' }]}>
                   <View style={[styles.journeyFill, { width: `${progressPct * 100}%`, backgroundColor: theme.accent }]} />
@@ -189,19 +189,19 @@ export default function Archive() {
                   ))}
                 </View>
                 <Text style={[styles.journeyPct, { color: theme.textSecondary }]}>
-                  {Math.round(progressPct * 100)}% COMPLETE
+                  ПРОЙДЕНО {Math.round(progressPct * 100)}%
                 </Text>
               </View>
             </CornerFrame>
 
-            <SectionDivider title="Statistics" color={theme.accent} />
+            <SectionDivider title="Статистика" color={theme.accent} />
             <View style={styles.statsGrid}>
-              <BigStat value={hero.rank + '-Rank'} label="Current rank" color={theme.accent} />
-              <BigStat value={RANK_TITLES[hero.rank as Rank]} label="Title" color={theme.accent} />
+              <BigStat value={'Ранг ' + hero.rank} label="Текущий ранг" color={theme.accent} />
+              <BigStat value={RANK_TITLES[hero.rank as Rank]} label="Титул" color={theme.accent} />
             </View>
             <View style={styles.statsGrid}>
-              <BigStat value={hero.global_xp.toLocaleString()} label="Total XP" color={theme.accent} />
-              <BigStat value={String(mandates.length)} label="Mandates" color={theme.accent} />
+              <BigStat value={hero.global_xp.toLocaleString()} label="Всего опыта" color={theme.accent} />
+              <BigStat value={String(mandates.length)} label="Мандаты" color={theme.accent} />
             </View>
           </View>
         )}
@@ -234,7 +234,7 @@ export default function Archive() {
                       <Glyph name="cross" color="#f44336" size={12} />
                       <Text style={[styles.dStat, { color: '#f44336' }]}>{failed}</Text>
                     </View>
-                    <Text style={[styles.dStat, { color: '#666' }]}>{logs.length} total</Text>
+                    <Text style={[styles.dStat, { color: '#666' }]}>всего {logs.length}</Text>
                   </View>
                 </View>
               );
@@ -247,15 +247,15 @@ export default function Archive() {
           <View style={styles.section}>
             {silenceData && (
               <>
-                <SectionDivider title="Silence protocol" color={theme.accent} style={styles.firstDivider} />
+                <SectionDivider title="Протокол Тишины" color={theme.accent} style={styles.firstDivider} />
                 <View style={styles.silenceGrid}>
-                  <BigStat value={String(silenceData.current_streak)} label="Current streak" color={theme.accent} />
-                  <BigStat value={String(silenceData.longest_streak)} label="Best streak" color={theme.accent} />
-                  <BigStat value={String(silenceData.total_relapses)} label="Relapses" color="#f44336" />
+                  <BigStat value={String(silenceData.current_streak)} label="Текущая серия" color={theme.accent} />
+                  <BigStat value={String(silenceData.longest_streak)} label="Лучшая серия" color={theme.accent} />
+                  <BigStat value={String(silenceData.total_relapses)} label="Срывы" color="#f44336" />
                 </View>
               </>
             )}
-            <SectionDivider title="All disciplines" color={theme.accent} />
+            <SectionDivider title="Все испытания" color={theme.accent} />
             {disciplines.map((d) => {
               const logs = disciplineLogs[d.id] ?? [];
               const total = logs.filter((l) => l.completed).length;
@@ -278,7 +278,7 @@ export default function Archive() {
         {/* ── HISTORY ── */}
         {activeTab === 'history' && (
           <View style={styles.section}>
-            <SectionDivider title="Last 28 days" color={theme.accent} style={styles.firstDivider} />
+            <SectionDivider title="Последние 28 дней" color={theme.accent} style={styles.firstDivider} />
             {[...new Set(recentLogs.map((l) => l.log_date))].sort().reverse().map((date) => {
               const dayLogs = recentLogs.filter((l) => l.log_date === date);
               const comp = dayLogs.filter((l) => l.completed).length;
