@@ -172,7 +172,7 @@ class Db private constructor(context: Context) :
     fun seeApp(pkg: String, label: String, defaultWatched: Boolean, time: Long): Boolean {
         val db = writableDatabase
         val existing = db.rawQuery("SELECT watched, label FROM app WHERE package = ?", arrayOf(pkg)).use { c ->
-            if (c.moveToFirst()) c.getInt(0) == 1 to c.getString(1) else null
+            if (c.moveToFirst()) (c.getInt(0) == 1) to c.getString(1) else null
         }
         if (existing == null) {
             db.insert("app", null, ContentValues().apply {

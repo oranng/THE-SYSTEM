@@ -97,11 +97,11 @@ object Categorizer {
         cat to words.map { w ->
             val e = Regex.escape(w)
             // Short tokens must stand alone ("bar" must not hit "barbershop"); long ones may be substrings.
-            if (w.length <= 4) Regex("(?i)(?<![\\p{L}\\p{N}])$e(?![\\p{L}\\p{N}])") else Regex("(?i)$e")
+            if (w.length <= 4) Regex("(?iu)(?<![\\p{L}\\p{N}])$e(?![\\p{L}\\p{N}])") else Regex("(?iu)$e")
         }
     }
 
-    private val fopRe = Regex("(?i)(?<![\\p{L}])(fop|фоп|flp|флп|ip|фізична особа)(?![\\p{L}])")
+    private val fopRe = Regex("(?iu)(?<![\\p{L}])(fop|фоп|flp|флп|ip|фізична особа)(?![\\p{L}])")
 
     /** Normalized merchant key used for learned rules: "SILPO 123 KYIV" → "silpo kyiv". */
     fun merchantKey(merchant: String): String =

@@ -15,11 +15,11 @@ enum class Bank(val display: String) {
 
 object Banks {
     private val rules: List<Pair<Bank, Regex>> = listOf(
-        Bank.WALLET to Regex("(?i)walletnfcrel|google wallet|google pay|кошел[её]к|гаманець|^wallet$"),
-        Bank.PUMB to Regex("(?i)pumb|пумб|fuib"),
-        Bank.RAIF to Regex("(?i)raif|райф|raiffeisen|aval"),
-        Bank.PRIVAT to Regex("(?i)privat|приват"),
-        Bank.MONO to Regex("(?i)monobank|ftband|^mono$"),
+        Bank.WALLET to Regex("(?iu)walletnfcrel|google wallet|google pay|кошел[её]к|гаманець|^wallet$"),
+        Bank.PUMB to Regex("(?iu)pumb|пумб|fuib"),
+        Bank.RAIF to Regex("(?iu)raif|райф|raiffeisen|aval"),
+        Bank.PRIVAT to Regex("(?iu)privat|приват"),
+        Bank.MONO to Regex("(?iu)monobank|ftband|^mono$"),
     )
 
     fun detect(packageName: String, appLabel: String): Bank {
@@ -32,7 +32,7 @@ object Banks {
     /** Apps watched without the player having to switch them on. */
     fun watchedByDefault(packageName: String, appLabel: String): Boolean =
         detect(packageName, appLabel) != Bank.OTHER ||
-            Regex("(?i)\\bbank\\b|банк|a-bank|sense|ukrsib|oschad|ощад|izibank|bybit").containsMatchIn("$packageName $appLabel")
+            Regex("(?iu)\\bbank\\b|банк|a-bank|sense|ukrsib|oschad|ощад|izibank|bybit").containsMatchIn("$packageName $appLabel")
 
     fun sourceName(packageName: String, appLabel: String): String {
         val bank = detect(packageName, appLabel)
@@ -44,7 +44,7 @@ object Banks {
 data class Money(val value: Double, val currency: String, val sign: Int, val range: IntRange)
 
 object Amounts {
-    private const val NUM = "\\d{1,3}(?:[ \\u00A0\\u202F]\\d{3})+(?:[.,]\\d{1,2})?|\\d+(?:[.,]\\d{1,2})?"
+    private const val NUM = "\\d{1,3}(?:[ \\u00A0\\u202F]\\d{3})+(?:[.,]\\d{1,2})?|\\d{1,3}(?:,\\d{3})+(?:\\.\\d{1,2})?|\\d{1,3}(?:\\.\\d{3})+(?:,\\d{1,2})?|\\d+(?:[.,]\\d{1,2})?"
     private const val CUR = "UAH|грн\\.?|₴|USD|\\$|EUR|€|PLN|zł|GBP|£"
     private const val SIGN = "[+\\-−–]"
 
@@ -109,11 +109,11 @@ object Amounts {
  */
 class NotificationParser(private val zone: ZoneId = ZoneId.systemDefault()) {
 
-    private val balanceLine = Regex("(?i)(доступно|доступний|баланс|залишок|остаток|available|balance|\\bbal\\b|кредитн)")
-    private val accountLine = Regex("(?i)^\\s*(рахунок|рахунку|счет|сч[её]т|картка|карта|card|account)\\b[^\\p{L}]*$|^\\s*(рахунок|счет|сч[её]т|card|account)\\s*:")
+    private val balanceLine = Regex("(?iu)(доступно|доступний|баланс|залишок|остаток|available|balance|\\bbal\\b|кредитн)")
+    private val accountLine = Regex("(?iu)^\\s*(рахунок|рахунку|счет|сч[её]т|картка|карта|card|account)\\b[^\\p{L}]*$|^\\s*(рахунок|счет|сч[её]т|card|account)\\s*:")
     private val dateRe = Regex("(\\d{2})[-./](\\d{2})[-./](\\d{4})[ ,T]+(\\d{1,2}):(\\d{2})")
     private val maskRe = Regex("(?:\\*|•{1,2}|·{2}|\\.{2,3})\\s?(\\d{4})(?!\\d)")
-    private val ignoreRe = Regex("(?i)(?<![\\p{L}])(код|code|пароль|password|otp|cvv)(?![\\p{L}])|відхилено|отклонен|declined|недостатньо коштів|недостаточно средств|insufficient")
+    private val ignoreRe = Regex("(?iu)(?<![\\p{L}])(код|code|пароль|password|otp|cvv)(?![\\p{L}])|відхилено|отклонен|declined|недостатньо коштів|недостаточно средств|insufficient")
 
     private val transferWords = listOf(
         "на свою картку", "на свою карту", "на свій рахунок", "на свой сч", "між своїми", "между своими",
@@ -133,11 +133,11 @@ class NotificationParser(private val zone: ZoneId = ZoneId.systemDefault()) {
     private val purchaseWords = listOf("покупка", "оплата", "оплачено", "payment", "purchase", "paid")
 
     private val opPrefix = Regex(
-        "(?i)^(?:переказ на свою картку|переказ на свою карту|переказ на картку|переказ на карту|переказ з картки|" +
+        "(?iu)^(?:переказ на свою картку|переказ на свою карту|переказ на картку|переказ на карту|переказ з картки|" +
             "поповнення картки|поповнення рахунку|зняття готівки|отримання переказу|" +
             "покупка|оплата|оплачено|платіж|платеж|списання|списание|зарахування|зачисление|поповнення|пополнение|" +
             "переказ|перевод|надходження|повернення|возврат|зняття|payment|purchase)" +
-            "(?:\\s*(?:від|з|із|в|у|на|до|от|из|at|to|from))?[:\\s]*",
+            "(?:\\s+(?:від|з|із|в|у|на|до|от|из|at|to|from)(?![\\p{L}]))?[:\\s]*",
     )
 
     fun parse(n: RawNotification): ParsedTx? {
@@ -214,13 +214,14 @@ class NotificationParser(private val zone: ZoneId = ZoneId.systemDefault()) {
 
     private fun merchant(bank: Bank, title: String, lines: List<String>, kind: Kind, source: String): String {
         if (bank == Bank.WALLET && title.isNotBlank() && Amounts.find(title).isEmpty() &&
-            !Regex("(?i)wallet|кошел|гаманець|google").containsMatchIn(title)
+            !Regex("(?iu)wallet|кошел|гаманець|google").containsMatchIn(title)
         ) {
             return clean(title)
         }
         for (line in lines) {
             if (dateRe.containsMatchIn(line) && line.replace(dateRe, "").none { it.isLetter() }) continue
             if (accountLine.containsMatchIn(line)) continue
+            if (Banks.detect("", line) != Bank.OTHER && line.split(' ').size <= 2) continue
             var s = line
             for (m in Amounts.find(line).reversed()) s = s.removeRange(m.range)
             // Drop "Visa Fishka Virtual *1534" style card names in front of the operation.
@@ -238,7 +239,7 @@ class NotificationParser(private val zone: ZoneId = ZoneId.systemDefault()) {
     }
 
     private fun isBareOperation(s: String): Boolean =
-        Regex("(?i)^(списання|списание|зарахування|зачисление|поповнення|пополнение|покупка|оплата|переказ|перевод|платіж|платеж)$").matches(s)
+        Regex("(?iu)^(списання|списание|зарахування|зачисление|поповнення|пополнение|покупка|оплата|переказ|перевод|платіж|платеж)$").matches(s)
 
     private fun clean(s: String): String =
         s.replace(Regex("[.…]+$"), "")
