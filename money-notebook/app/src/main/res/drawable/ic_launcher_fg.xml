@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A coin with the hryvnia sign, centred in the 108dp adaptive canvas. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <path android:fillColor="#FFE8C468"
+        android:pathData="M54,30a24,24 0,1 1,0 48a24,24 0,1 1,0 -48z" />
+    <path android:fillColor="#FF0F3D2E"
+        android:pathData="M54,34a20,20 0,1 1,0 40a20,20 0,1 1,0 -40z" />
+    <path android:strokeColor="#FFE8C468" android:strokeWidth="3.2" android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M46,46c2,-4 6,-5 9,-5c4,0 7,2.5 7,6c0,6 -16,8 -16,15c0,3.5 3,6 7.5,6c3.5,0 6.5,-1.5 8,-4.5" />
+    <path android:strokeColor="#FFE8C468" android:strokeWidth="2.6" android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M43,52h22M43,58h22" />
+</vector>
