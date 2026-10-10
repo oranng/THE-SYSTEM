@@ -1,6 +1,5 @@
 package com.oranng.kazna.ui
 
-import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -79,7 +78,7 @@ fun SettingsScreen(resumes: Int, version: Int) {
                     Spacer(Modifier.height(4.dp))
                     StatusLine("Без ограничений батареи", batteryFree)
                     Text(
-                        "Некоторые прошивки (ColorOS, MIUI, One UI) усыпляют фоновые службы. Разреши Казне работать без ограничений и включи «Автозапуск», если он есть.",
+                        "Некоторые прошивки (ColorOS, MIUI, One UI) усыпляют фоновые службы. В списке выбери Казну → «Не ограничивать», а в «О приложении» включи «Автозапуск», если он есть.",
                         color = Palette.dim, fontSize = 12.sp,
                     )
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -159,7 +158,7 @@ fun SettingsScreen(resumes: Int, version: Int) {
                 }
             }
         }
-        item { Text("Казна 1.0 · данные только на этом телефоне", color = Palette.dim, fontSize = 11.sp, modifier = Modifier.padding(bottom = 24.dp)) }
+        item { Text("Казна 1.0.1 · данные только на этом телефоне", color = Palette.dim, fontSize = 11.sp, modifier = Modifier.padding(bottom = 24.dp)) }
     }
 }
 
@@ -174,12 +173,12 @@ private fun StatusLine(label: String, ok: Boolean) {
 private fun ignoresBattery(context: Context): Boolean =
     (context.getSystemService(Context.POWER_SERVICE) as PowerManager).isIgnoringBatteryOptimizations(context.packageName)
 
-@SuppressLint("BatteryLife")
+/** Opens the system list; the player picks Казна → «Не ограничивать». No extra permission needed. */
 private fun requestBattery(context: Context) {
     runCatching {
-        context.startActivity(Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:${context.packageName}")))
-    }.onFailure {
         context.startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
+    }.onFailure {
+        context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${context.packageName}")))
     }
 }
 
