@@ -1,5 +1,6 @@
 package com.oranng.kazna.ui
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -28,16 +29,35 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import com.oranng.kazna.data.Db
 import java.time.YearMonth
 
 class MainActivity : ComponentActivity() {
+    /** Bumped each time the widget's "+" is pressed; the UI opens the add dialog. */
+    private val addRequests = mutableIntStateOf(0)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        if (savedInstanceState == null) handle(intent)
         setContent {
-            MaterialTheme(colorScheme = Palette.scheme) { App() }
+            MaterialTheme(colorScheme = Palette.scheme) { App(addRequests.intValue) }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handle(intent)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        KaznaWidget.refresh(this)
+    }
+
+    private fun handle(intent: Intent?) {
+        if (intent?.action == KaznaWidget.ACTION_ADD) addRequests.intValue++
     }
 }
 
@@ -45,7 +65,7 @@ class MainActivity : ComponentActivity() {
 data class OpsFilter(val category: String? = null, val reviewOnly: Boolean = false)
 
 @Composable
-fun App() {
+fun App(addRequests: Int = 0) {
     val context = LocalContext.current
     val db = remember { Db.get(context) }
     val version by Db.version.collectAsState()
@@ -64,6 +84,12 @@ fun App() {
     var filter by remember { mutableStateOf(OpsFilter()) }
 
     val txs = remember(version) { db.all() }
+
+    // One-shot: the widget's "+" opens the add dialog once, not on every tab switch.
+    var pendingAdd by remember { mutableStateOf(false) }
+    LaunchedEffect(addRequests) {
+        if (addRequests > 0) { filter = OpsFilter(); tab = 1; pendingAdd = true }
+    }
 
     Scaffold(
         containerColor = Palette.bg,
@@ -91,7 +117,7 @@ fun App() {
                     onOpenOps = { f -> filter = f; tab = 1 },
                     onOpenSettings = { tab = 2 },
                 )
-                1 -> OperationsScreen(txs = txs, month = month, onMonth = { month = it }, filter = filter, onFilter = { filter = it })
+                1 -> OperationsScreen(txs = txs, month = month, onMonth = { month = it }, filter = filter, onFilter = { filter = it }, openAdd = pendingAdd, onAddOpened = { pendingAdd = false })
                 else -> SettingsScreen(resumes = resumes, version = version)
             }
         }

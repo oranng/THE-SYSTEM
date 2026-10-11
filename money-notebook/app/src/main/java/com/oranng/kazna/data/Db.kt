@@ -10,6 +10,7 @@ import com.oranng.kazna.core.Kind
 import com.oranng.kazna.core.Origin
 import com.oranng.kazna.core.Tx
 import com.oranng.kazna.core.TxStore
+import com.oranng.kazna.ui.KaznaWidget
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -33,13 +34,19 @@ class Db private constructor(context: Context) :
 
     companion object {
         @Volatile private var instance: Db? = null
+        @Volatile private var appContext: Context? = null
         fun get(context: Context): Db =
-            instance ?: synchronized(this) { instance ?: Db(context).also { instance = it } }
+            instance ?: synchronized(this) {
+                instance ?: Db(context).also { instance = it; appContext = context.applicationContext }
+            }
 
         private val _version = MutableStateFlow(0)
         /** Bumped on every write so open screens refresh. */
         val version: StateFlow<Int> = _version
-        fun changed() { _version.value = _version.value + 1 }
+        fun changed() {
+            _version.value = _version.value + 1
+            appContext?.let { runCatching { KaznaWidget.refresh(it) } }
+        }
     }
 
     override fun onCreate(db: SQLiteDatabase) {

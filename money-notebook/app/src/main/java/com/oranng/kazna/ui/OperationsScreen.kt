@@ -24,6 +24,7 @@ import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,10 +51,13 @@ fun OperationsScreen(
     onMonth: (YearMonth) -> Unit,
     filter: OpsFilter,
     onFilter: (OpsFilter) -> Unit,
+    openAdd: Boolean = false,
+    onAddOpened: () -> Unit = {},
 ) {
     var kind by remember { mutableStateOf(KindFilter.ALL) }
     var editing by remember { mutableStateOf<Tx?>(null) }
     var adding by remember { mutableStateOf(false) }
+    LaunchedEffect(openAdd) { if (openAdd) { adding = true; onAddOpened() } }
 
     val shown = remember(txs, month, filter, kind) {
         txs.filter { Stats.monthOf(it.time, Fmt.zone) == month }

@@ -158,7 +158,7 @@ fun SettingsScreen(resumes: Int, version: Int) {
                 }
             }
         }
-        item { Text("Казна 1.0.1 · данные только на этом телефоне", color = Palette.dim, fontSize = 11.sp, modifier = Modifier.padding(bottom = 24.dp)) }
+        item { Text("Казна 1.1 · данные только на этом телефоне", color = Palette.dim, fontSize = 11.sp, modifier = Modifier.padding(bottom = 24.dp)) }
     }
 }
 
