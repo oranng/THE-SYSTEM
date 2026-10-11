@@ -37,8 +37,25 @@ cd money-notebook
 ./gradlew assembleRelease       # app/build/outputs/apk/release/app-release.apk
 ```
 
-Нужны JDK 17 и Android SDK (platform 36). Релизная сборка подписана отладочным
-ключом: APK ставится на любой телефон, но в Google Play его не загрузить.
+Нужны JDK 17 и Android SDK (platform 36).
+
+### Ключ подписи
+
+Телефон ставит обновление поверх старой версии (без потери данных), только если
+оба APK подписаны одним ключом. Постоянный ключ Казны хранится у владельца и
+**никогда не коммитится** (`keystore/` и `*.jks` в `.gitignore`).
+
+- Положите файл в `money-notebook/keystore/kazna.jks` или укажите путь в
+  переменной `KAZNA_KEYSTORE`.
+- Алиас и пароли по умолчанию: `androiddebugkey` / `android`. Их можно
+  переопределить свойствами Gradle `kaznaKeyAlias`, `kaznaStorePassword`,
+  `kaznaKeyPassword`.
+- Проверка: SHA-256 сертификата должен быть
+  `a6b799a3f559f521944de26d7e14759828cc8a86fb62efbdfd42400b5ed58e94`
+  (`apksigner verify --print-certs app-release.apk`).
+
+Без ключа сборка подпишется локальным отладочным ключом, и такой APK уже
+установленную Казну не обновит.
 
 ## После установки
 

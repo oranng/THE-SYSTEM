@@ -16,14 +16,26 @@ android {
         versionName = "1.1.0"
     }
 
+    // Permanent signing key: the phone only accepts updates signed with the same key.
+    // The key file is private (never committed): put it at money-notebook/keystore/kazna.jks
+    // or point KAZNA_KEYSTORE at it. Without it the build falls back to the local debug key,
+    // which will NOT update an installed Казна.
+    val keystoreFile = (System.getenv("KAZNA_KEYSTORE") ?: rootProject.file("keystore/kazna.jks").path).let(::file)
+    signingConfigs {
+        create("kazna") {
+            storeFile = keystoreFile
+            storePassword = (findProperty("kaznaStorePassword") as String?) ?: "android"
+            keyAlias = (findProperty("kaznaKeyAlias") as String?) ?: "androiddebugkey"
+            keyPassword = (findProperty("kaznaKeyPassword") as String?) ?: "android"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            // Personal sideloaded build: signed with the local debug key so it
-            // installs on any phone without a keystore. Not for Google Play.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = if (keystoreFile.exists()) signingConfigs.getByName("kazna") else signingConfigs.getByName("debug")
         }
     }
 
