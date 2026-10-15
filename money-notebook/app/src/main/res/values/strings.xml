@@ -2,4 +2,8 @@
     <string name="app_name">Казна</string>
     <string name="listener_label">Казна — учёт трат</string>
     <string name="widget_description">Сколько потрачено сегодня и за месяц</string>
+    <string name="widget_title_month">Казна · месяц</string>
+    <string name="widget_add">Добавить трату</string>
+    <string name="widget_income">Доход</string>
+    <string name="widget_spend">Расход</string>
 </resources>

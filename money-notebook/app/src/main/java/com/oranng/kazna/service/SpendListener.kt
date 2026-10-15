@@ -82,6 +82,9 @@ class SpendListener : NotificationListenerService() {
                 val raw = toRaw(sbn, label)
                 if (raw.title.isBlank() && raw.text.isBlank() && raw.bigText.isBlank()) return
                 val result = Ledger(db).ingest(raw)
+                if (result == IngestResult.ADDED || result == IngestResult.MERGED) {
+                    if (db.pendingRate().isNotEmpty()) RateJob.schedule(context)
+                }
                 if (result != IngestResult.DUPLICATE) {
                     val body = listOf(raw.text, raw.bigText.takeIf { it != raw.text } ?: "", raw.lines.joinToString("\n"))
                         .filter { it.isNotBlank() }.joinToString("\n")

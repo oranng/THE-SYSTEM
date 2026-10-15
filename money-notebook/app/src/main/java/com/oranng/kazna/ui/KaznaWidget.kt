@@ -10,23 +10,80 @@ import android.content.Intent
 import android.view.View
 import android.widget.RemoteViews
 import com.oranng.kazna.R
+import com.oranng.kazna.core.Kind
 import com.oranng.kazna.core.Widget
+import com.oranng.kazna.core.WidgetConfig
 import com.oranng.kazna.data.Db
 
+/** Per-widget settings, kept in SharedPreferences under the widget id. */
+object WidgetPrefs {
+    private fun prefs(context: Context) = context.getSharedPreferences("widgets", Context.MODE_PRIVATE)
+
+    fun load(context: Context, id: Int): WidgetConfig {
+        val p = prefs(context)
+        val d = defaults(context)
+        return WidgetConfig(
+            showIncome = p.getBoolean("$id.income", d.showIncome),
+            showSpend = p.getBoolean("$id.spend", d.showSpend),
+            showHistory = p.getBoolean("$id.history", d.showHistory),
+            week = p.getBoolean("$id.week", d.week),
+        )
+    }
+
+    fun save(context: Context, id: Int, c: WidgetConfig) {
+        prefs(context).edit()
+            .putBoolean("$id.income", c.showIncome).putBoolean("$id.spend", c.showSpend)
+            .putBoolean("$id.history", c.showHistory).putBoolean("$id.week", c.week)
+            .apply()
+    }
+
+    /** Settings used by widgets that were never configured (and by new ones as a start). */
+    fun defaults(context: Context): WidgetConfig {
+        val p = prefs(context)
+        return WidgetConfig(
+            showIncome = p.getBoolean("default.income", true),
+            showSpend = p.getBoolean("default.spend", true),
+            showHistory = p.getBoolean("default.history", true),
+            week = p.getBoolean("default.week", false),
+        )
+    }
+
+    /** Apply one setup to every placed widget and make it the default. */
+    fun saveAll(context: Context, c: WidgetConfig) {
+        prefs(context).edit()
+            .putBoolean("default.income", c.showIncome).putBoolean("default.spend", c.showSpend)
+            .putBoolean("default.history", c.showHistory).putBoolean("default.week", c.week)
+            .apply()
+        KaznaWidget.ids(context).forEach { save(context, it, c) }
+    }
+
+    fun forget(context: Context, ids: IntArray) {
+        val e = prefs(context).edit()
+        ids.forEach { id -> listOf("income", "spend", "history", "week").forEach { e.remove("$id.$it") } }
+        e.apply()
+    }
+}
+
 /**
- * Home-screen widget: today's spend, the month, the last purchase and a "+" for cash.
- * Plain RemoteViews, no background work: it is redrawn whenever a transaction is
- * written (Db.changed) and once at midnight so "today" resets.
+ * Home-screen widget: income in green and spending in red for the month or the last
+ * 7 days, today's operations and a "+" for cash. Each widget has its own settings.
+ * Plain RemoteViews, no background work: redrawn on every database write and once
+ * just after midnight.
  */
 class KaznaWidget : AppWidgetProvider() {
 
     override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) {
-        render(context, manager, ids)
+        ids.forEach { render(context, manager, it) }
+        scheduleMidnight(context)
     }
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
         if (intent.action == ACTION_MIDNIGHT) refresh(context)
+    }
+
+    override fun onDeleted(context: Context, ids: IntArray) {
+        WidgetPrefs.forget(context, ids)
     }
 
     override fun onDisabled(context: Context) {
@@ -37,48 +94,61 @@ class KaznaWidget : AppWidgetProvider() {
         private const val ACTION_MIDNIGHT = "com.oranng.kazna.WIDGET_MIDNIGHT"
         const val ACTION_ADD = "com.oranng.kazna.ADD"
 
+        fun ids(context: Context): IntArray =
+            AppWidgetManager.getInstance(context).getAppWidgetIds(ComponentName(context, KaznaWidget::class.java))
+
         /** Redraw every placed widget. Cheap; safe to call after each write. */
         fun refresh(context: Context) {
             val manager = AppWidgetManager.getInstance(context)
-            val ids = manager.getAppWidgetIds(ComponentName(context, KaznaWidget::class.java))
-            if (ids.isNotEmpty()) render(context, manager, ids)
+            val ids = ids(context)
+            if (ids.isEmpty()) return
+            ids.forEach { render(context, manager, it) }
+            scheduleMidnight(context)
         }
 
-        private fun render(context: Context, manager: AppWidgetManager, ids: IntArray) {
-            val s = Widget.summary(Db.get(context).all(), Fmt.zone)
-            val views = RemoteViews(context.packageName, R.layout.widget_kazna)
+        fun render(context: Context, manager: AppWidgetManager, id: Int) {
+            val cfg = WidgetPrefs.load(context, id)
+            val s = Widget.summary(Db.get(context).all(), cfg, Fmt.zone)
+            val v = RemoteViews(context.packageName, R.layout.widget_kazna)
 
-            views.setTextViewText(R.id.widget_today, Fmt.money(s.today))
-            views.setTextViewText(
-                R.id.widget_month,
-                "Месяц: ${Fmt.money(s.month)}" + if (s.perDay > 0) " · в день ${Fmt.money(s.perDay)}" else "",
-            )
-            views.setTextViewText(
-                R.id.widget_last,
-                s.last?.let { "${it.merchant}  −${Fmt.money(it.amount, it.currency)} · ${Fmt.time(it.time)}" }
-                    ?: "Трат пока нет — они появятся сами",
-            )
-            if (s.review > 0) {
-                views.setViewVisibility(R.id.widget_review, View.VISIBLE)
-                views.setTextViewText(R.id.widget_review, "! ${s.review} проверить")
+            v.setTextViewText(R.id.widget_title, if (cfg.week) "Казна · 7 дней" else "Казна · ${Fmt.monthTitle(java.time.YearMonth.now()).substringBefore(' ').lowercase()}")
+            v.setViewVisibility(R.id.widget_income_box, if (cfg.showIncome) View.VISIBLE else View.GONE)
+            v.setViewVisibility(R.id.widget_spend_box, if (cfg.showSpend) View.VISIBLE else View.GONE)
+            v.setTextViewText(R.id.widget_income, "+" + Fmt.money(s.income))
+            v.setTextViewText(R.id.widget_spend, "−" + Fmt.money(s.spent))
+
+            if (cfg.showHistory) {
+                v.setViewVisibility(R.id.widget_history, View.VISIBLE)
+                v.setTextViewText(
+                    R.id.widget_history,
+                    if (s.history.isEmpty()) "Сегодня операций нет" else s.history.joinToString("\n") { t ->
+                        val sign = if (t.kind == Kind.INCOME) "+" else "−"
+                        "${Fmt.time(t.time)}  ${t.merchant.take(22)}  $sign${Fmt.money(t.amount, t.currency)}"
+                    },
+                )
             } else {
-                views.setViewVisibility(R.id.widget_review, View.GONE)
+                v.setViewVisibility(R.id.widget_history, View.GONE)
+            }
+
+            if (s.review > 0) {
+                v.setViewVisibility(R.id.widget_review, View.VISIBLE)
+                v.setTextViewText(R.id.widget_review, "! ${s.review}")
+            } else {
+                v.setViewVisibility(R.id.widget_review, View.GONE)
             }
 
             val open = Intent(context, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-            views.setOnClickPendingIntent(
+            v.setOnClickPendingIntent(
                 R.id.widget_root,
                 PendingIntent.getActivity(context, 0, open, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT),
             )
             val add = Intent(context, MainActivity::class.java).setAction(ACTION_ADD)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-            views.setOnClickPendingIntent(
+            v.setOnClickPendingIntent(
                 R.id.widget_add,
                 PendingIntent.getActivity(context, 1, add, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT),
             )
-
-            manager.updateAppWidget(ids, views)
-            scheduleMidnight(context)
+            manager.updateAppWidget(id, v)
         }
 
         /** Inexact alarm (no exact-alarm permission needed); a few minutes late is fine. */

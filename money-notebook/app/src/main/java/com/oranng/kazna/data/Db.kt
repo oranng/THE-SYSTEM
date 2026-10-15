@@ -30,7 +30,7 @@ data class SeenApp(val packageName: String, val label: String, val watched: Bool
 
 /** Local SQLite storage. Nothing ever leaves the phone. */
 class Db private constructor(context: Context) :
-    SQLiteOpenHelper(context.applicationContext, "kazna.db", null, 1), TxStore {
+    SQLiteOpenHelper(context.applicationContext, "kazna.db", null, 2), TxStore {
 
     companion object {
         @Volatile private var instance: Db? = null
@@ -68,9 +68,11 @@ class Db private constructor(context: Context) :
                 fingerprint TEXT NOT NULL DEFAULT '',
                 transfer_hint INTEGER NOT NULL DEFAULT 0,
                 purchase_hint INTEGER NOT NULL DEFAULT 0,
-                review INTEGER NOT NULL DEFAULT 0
+                review INTEGER NOT NULL DEFAULT 0,
+                uah REAL
             )""",
         )
+        db.execSQL(RATE_TABLE)
         db.execSQL("CREATE INDEX tx_time ON tx(time)")
         db.execSQL("CREATE TABLE rule (merchant_key TEXT PRIMARY KEY, category TEXT NOT NULL)")
         db.execSQL(
@@ -87,7 +89,32 @@ class Db private constructor(context: Context) :
         db.execSQL("CREATE TABLE app (package TEXT PRIMARY KEY, label TEXT NOT NULL, watched INTEGER NOT NULL, last_seen INTEGER NOT NULL)")
     }
 
-    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) = Unit
+    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+        if (oldVersion < 2) {
+            // 1.2: hryvnia value for foreign-currency spends + NBU rate cache.
+            db.execSQL("ALTER TABLE tx ADD COLUMN uah REAL")
+            db.execSQL("UPDATE tx SET uah = amount WHERE currency = 'UAH'")
+            db.execSQL(RATE_TABLE)
+        }
+    }
+
+    private val RATE_TABLE = "CREATE TABLE IF NOT EXISTS rate (currency TEXT NOT NULL, day TEXT NOT NULL, rate REAL NOT NULL, PRIMARY KEY (currency, day))"
+
+    /** Foreign-currency transactions still waiting for their hryvnia value. */
+    fun pendingRate(): List<Tx> = query("SELECT * FROM tx WHERE currency != 'UAH' AND uah IS NULL ORDER BY time")
+
+    fun cachedRate(currency: String, day: java.time.LocalDate): Double? =
+        readableDatabase.rawQuery("SELECT rate FROM rate WHERE currency = ? AND day = ?", arrayOf(currency, day.toString())).use {
+            if (it.moveToFirst()) it.getDouble(0) else null
+        }
+
+    fun cacheRate(currency: String, day: java.time.LocalDate, rate: Double) {
+        writableDatabase.insertWithOnConflict(
+            "rate", null,
+            ContentValues().apply { put("currency", currency); put("day", day.toString()); put("rate", rate) },
+            SQLiteDatabase.CONFLICT_REPLACE,
+        )
+    }
 
     // ── TxStore ──────────────────────────────────────────────────────────────
 
@@ -239,6 +266,7 @@ class Db private constructor(context: Context) :
             transferHint = c.getInt(idx("transfer_hint")) == 1,
             purchaseHint = c.getInt(idx("purchase_hint")) == 1,
             review = c.getInt(idx("review")) == 1,
+            uah = if (c.isNull(idx("uah"))) null else c.getDouble(idx("uah")),
         )
     }
 
@@ -251,5 +279,7 @@ class Db private constructor(context: Context) :
         put("origin", tx.origin.name); put("note", tx.note); put("fingerprint", tx.fingerprint)
         put("transfer_hint", if (tx.transferHint) 1 else 0); put("purchase_hint", if (tx.purchaseHint) 1 else 0)
         put("review", if (tx.review) 1 else 0)
+        val uah = tx.uahValue
+        if (uah == null) putNull("uah") else put("uah", uah)
     }
 }

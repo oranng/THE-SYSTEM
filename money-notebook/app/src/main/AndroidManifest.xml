@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Only for the NBU exchange rate (bank.gov.ua) when a Bybit spend is in USD. -->
+    <uses-permission android:name="android.permission.INTERNET" />
     <!-- Bank apps have launcher icons; this makes their names visible on Android 11+
          without asking for the list of all installed apps. -->
     <queries>
@@ -31,6 +33,16 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".ui.WidgetConfigActivity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:taskAffinity="">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
+
         <service
             android:name=".service.SpendListener"
             android:exported="true"
@@ -40,6 +52,11 @@
                 <action android:name="android.service.notification.NotificationListenerService" />
             </intent-filter>
         </service>
+
+        <service
+            android:name=".service.RateJob"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <receiver
             android:name=".service.BootReceiver"

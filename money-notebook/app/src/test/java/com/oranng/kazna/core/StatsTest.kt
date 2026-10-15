@@ -41,6 +41,46 @@ class StatsTest {
     @Test fun csvHasHeaderAndSignedAmounts() {
         val csv = Stats.csv(listOf(t(1, 100.5, Kind.SPEND, Categories.GROCERIES, m = "SILPO")), zone)
         assertTrue(csv.startsWith("Дата;"))
-        assertTrue(csv.contains("-100,50;UAH;Трата;\"Продукты\";\"SILPO\""))
+        assertTrue(csv.contains("-100,50;UAH;-100,50;Трата;\"Продукты\";\"SILPO\""))
+    }
+
+    @Test fun foreignSpendCountsOnceConverted() {
+        val usd = t(7, 4.88, Kind.SPEND, Categories.GROCERIES, cur = "USD", m = "box express market")
+        val pending = Stats.month(listOf(usd), YearMonth.of(2026, 10), zone, LocalDate.of(2026, 10, 7))
+        assertEquals(0.0, pending.spent, 0.001)
+        assertEquals(1, pending.pendingRate)
+        val done = Stats.month(listOf(usd.copy(uah = 201.5)), YearMonth.of(2026, 10), zone, LocalDate.of(2026, 10, 7))
+        assertEquals(201.5, done.spent, 0.001)
+        assertEquals(0, done.pendingRate)
+        assertEquals(201.5, done.today, 0.001)
+    }
+
+    @Test fun rangeOverThreeMonths() {
+        fun at(m: Int, d: Int) = LocalDateTime.of(2026, m, d, 12, 0).atZone(zone).toInstant().toEpochMilli()
+        val txs = listOf(
+            t(1, 100.0, Kind.SPEND, Categories.GROCERIES).copy(time = at(8, 5)),
+            t(1, 300.0, Kind.SPEND, Categories.TAXI).copy(time = at(9, 5)),
+            t(1, 1000.0, Kind.INCOME, Categories.INCOME).copy(time = at(10, 1)),
+            t(1, 200.0, Kind.SPEND, Categories.GROCERIES).copy(time = at(10, 2)),
+            t(1, 999.0, Kind.SPEND, Categories.GROCERIES).copy(time = at(7, 2)), // outside the window
+        )
+        val r = Stats.range(txs, 3, YearMonth.of(2026, 10), zone)
+        assertEquals(listOf(YearMonth.of(2026, 8), YearMonth.of(2026, 9), YearMonth.of(2026, 10)), r.months.map { it.month })
+        assertEquals(600.0, r.spent, 0.001)
+        assertEquals(1000.0, r.income, 0.001)
+        assertEquals(200.0, r.avgSpent, 0.001)
+        assertEquals(300.0, r.months[1].spent, 0.001)
+        assertEquals(Categories.GROCERIES, r.categories.first().category)
+    }
+
+    @Test fun weekAndMonthPeriods() {
+        val txs = listOf(
+            t(1, 100.0, Kind.SPEND, Categories.GROCERIES),
+            t(9, 50.0, Kind.SPEND, Categories.GROCERIES),
+            t(9, 700.0, Kind.INCOME, Categories.INCOME),
+        )
+        val today = LocalDate.of(2026, 10, 10)
+        assertEquals(150.0 to 700.0, Stats.period(txs, week = false, zone = zone, today = today))
+        assertEquals(50.0 to 700.0, Stats.period(txs, week = true, zone = zone, today = today))
     }
 }

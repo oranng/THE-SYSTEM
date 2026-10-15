@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
-            android:text="Казна · сегодня"
+            android:text="@string/widget_title_month"
             android:textColor="#FF8C9A95"
             android:textSize="12sp" />
 
@@ -39,7 +39,7 @@
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:background="@drawable/widget_add_bg"
-            android:contentDescription="Добавить трату"
+            android:contentDescription="@string/widget_add"
             android:gravity="center"
             android:text="+"
             android:textColor="#FF101413"
@@ -47,32 +47,69 @@
             android:textStyle="bold" />
     </RelativeLayout>
 
-    <TextView
-        android:id="@+id/widget_today"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
-        android:maxLines="1"
-        android:text="0 ₴"
-        android:textColor="#FFE9EEEB"
-        android:textSize="30sp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/widget_month"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:maxLines="1"
-        android:textColor="#FFE8C468"
-        android:textSize="13sp" />
-
-    <TextView
-        android:id="@+id/widget_last"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/widget_income_box"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/widget_income"
+                android:textColor="#FF8C9A95"
+                android:textSize="11sp" />
+
+            <TextView
+                android:id="@+id/widget_income"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:textColor="#FF6FD6A0"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/widget_spend_box"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/widget_spend"
+                android:textColor="#FF8C9A95"
+                android:textSize="11sp" />
+
+            <TextView
+                android:id="@+id/widget_spend"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:textColor="#FFEF8A7A"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/widget_history"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
         android:ellipsize="end"
-        android:maxLines="1"
-        android:textColor="#FF8C9A95"
+        android:lineSpacingExtra="2dp"
+        android:maxLines="5"
+        android:textColor="#FFB7C2BE"
         android:textSize="12sp" />
 </LinearLayout>

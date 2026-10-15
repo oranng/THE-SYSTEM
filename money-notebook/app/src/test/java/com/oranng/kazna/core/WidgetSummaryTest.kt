@@ -1,7 +1,6 @@
 package com.oranng.kazna.core
 
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -16,27 +15,31 @@ class WidgetSummaryTest {
         account = null, balance = null, origin = Origin.AUTO, review = review,
     )
 
-    @Test fun todayMonthAndLastSpend() {
-        val txs = listOf(
-            tx(1, 10, 300.0),
-            tx(10, 9, 120.0, m = "WOG"),
-            tx(10, 18, 80.0, m = "ATB", review = true),
-            tx(10, 20, 500.0, kind = Kind.TRANSFER), // never counted, never "last spend"
-            tx(10, 21, 1000.0, kind = Kind.INCOME),
-        )
-        val w = Widget.summary(txs, zone, LocalDate.of(2026, 10, 10))
-        assertEquals(200.0, w.today, 0.001)
-        assertEquals(500.0, w.month, 0.001)
-        assertEquals(50.0, w.perDay, 0.001)
-        assertEquals("ATB", w.last!!.merchant)
+    private val txs = listOf(
+        tx(1, 10, 300.0),
+        tx(5, 10, 2000.0, kind = Kind.INCOME, m = "Зарплата"),
+        tx(10, 9, 120.0, m = "WOG"),
+        tx(10, 18, 80.0, m = "ATB", review = true),
+        tx(10, 20, 500.0, kind = Kind.TRANSFER), // never counted, never in history
+        tx(10, 21, 1000.0, kind = Kind.INCOME, m = "Фриланс"),
+    )
+
+    @Test fun monthIncomeAndSpend() {
+        val w = Widget.summary(txs, WidgetConfig(week = false), zone, LocalDate.of(2026, 10, 10))
+        assertEquals(500.0, w.spent, 0.001)
+        assertEquals(3000.0, w.income, 0.001)
         assertEquals(1, w.review)
     }
 
-    @Test fun emptyIsZero() {
-        val w = Widget.summary(emptyList(), zone, LocalDate.of(2026, 10, 10))
-        assertEquals(0.0, w.today, 0.0)
-        assertEquals(0.0, w.perDay, 0.0)
-        assertNull(w.last)
+    @Test fun weekIncomeAndSpend() {
+        val w = Widget.summary(txs, WidgetConfig(week = true), zone, LocalDate.of(2026, 10, 10))
+        assertEquals(200.0, w.spent, 0.001)
+        assertEquals(3000.0, w.income, 0.001) // Oct 5 is within the last 7 days
+    }
+
+    @Test fun todayHistoryNewestFirstWithoutTransfers() {
+        val w = Widget.summary(txs, WidgetConfig(), zone, LocalDate.of(2026, 10, 10))
+        assertEquals(listOf("Фриланс", "ATB", "WOG"), w.history.map { it.merchant })
     }
 
     @Test fun midnight() {

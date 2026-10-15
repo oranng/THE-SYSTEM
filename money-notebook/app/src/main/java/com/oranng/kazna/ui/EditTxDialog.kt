@@ -39,7 +39,8 @@ import com.oranng.kazna.data.Db
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun EditTxDialog(tx: Tx?, onDismiss: () -> Unit) {
-    val db = Db.get(LocalContext.current)
+    val context = LocalContext.current
+    val db = Db.get(context)
     var merchant by remember { mutableStateOf(tx?.merchant.orEmpty()) }
     var amount by remember { mutableStateOf(tx?.let { "%.2f".format(java.util.Locale.ROOT, it.amount).replace('.', ',') }.orEmpty()) }
     var kind by remember { mutableStateOf(tx?.kind ?: Kind.SPEND) }
@@ -60,6 +61,13 @@ fun EditTxDialog(tx: Tx?, onDismiss: () -> Unit) {
                     Text("${it.source}${it.account?.let { a -> " *$a" } ?: ""} · ${Fmt.dateTime(it.time)}", color = Palette.dim, fontSize = 12.sp)
                     if (it.note.isNotBlank()) Text(it.note, color = Palette.warn, fontSize = 12.sp)
                     it.balance?.let { b -> Text("Остаток после операции: ${Fmt.money(b, it.currency)}", color = Palette.dim, fontSize = 12.sp) }
+                    if (it.currency != "UAH") {
+                        Text(
+                            it.uah?.let { u -> "В гривнах по курсу НБУ на дату покупки: ${Fmt.money(u)}" }
+                                ?: "Курс НБУ ещё не получен: пересчитается при подключении к интернету.",
+                            color = Palette.dim, fontSize = 12.sp,
+                        )
+                    }
                 }
                 OutlinedTextField(
                     value = merchant, onValueChange = { merchant = it }, singleLine = true,
@@ -125,7 +133,10 @@ fun EditTxDialog(tx: Tx?, onDismiss: () -> Unit) {
                         ),
                     )
                 } else {
-                    db.update(tx.copy(merchant = merchant.trim(), amount = a, kind = kind, direction = direction, category = cat, review = false))
+                    // A changed foreign amount needs a fresh conversion.
+                    val uah = if (tx.currency != "UAH" && kotlin.math.abs(a - tx.amount) > 0.001) null else tx.uah
+                    db.update(tx.copy(merchant = merchant.trim(), amount = a, kind = kind, direction = direction, category = cat, review = false, uah = uah))
+                    if (tx.currency != "UAH" && uah == null) com.oranng.kazna.service.RateJob.schedule(context)
                 }
                 if (kind == Kind.SPEND && rememberRule && Categorizer.merchantKey(merchant).isNotBlank()) {
                     db.learnRule(merchant.trim(), category)

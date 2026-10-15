@@ -113,8 +113,14 @@ fun OverviewScreen(
                     Text(Fmt.money(s.spent), fontSize = 36.sp, fontWeight = FontWeight.Bold, color = Palette.text)
                     if (s.otherCurrencies.isNotEmpty()) {
                         Text(
-                            "и ещё " + s.otherCurrencies.entries.joinToString(" · ") { Fmt.money(it.value, it.key) },
+                            "в том числе с валютных карт " + s.otherCurrencies.entries.joinToString(" · ") { Fmt.money(it.value, it.key) },
                             color = Palette.dim, fontSize = 13.sp,
+                        )
+                    }
+                    if (s.pendingRate > 0) {
+                        Text(
+                            "Ждут курса НБУ: ${s.pendingRate}. Пересчитаются в гривны, когда появится интернет.",
+                            color = Palette.warn, fontSize = 12.sp,
                         )
                     }
                     Spacer(Modifier.height(12.dp))

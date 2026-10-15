@@ -74,7 +74,18 @@ data class Tx(
     val purchaseHint: Boolean = false,
     /** Needs the player's attention: unknown gap or unsure category. */
     val review: Boolean = false,
+    /**
+     * Value in hryvnias for a foreign-currency operation (Bybit card in USD), at the
+     * NBU rate of the operation's date. Null while the rate is not fetched yet.
+     */
+    val uah: Double? = null,
 ) {
     /** Signed effect on the account balance. */
     val signed: Double get() = amount * direction
+
+    /** Amount in hryvnias, or null while a foreign amount waits for its rate. */
+    val uahValue: Double? get() = if (currency == "UAH") amount else uah
+
+    /** Waiting for the exchange rate. */
+    val pendingRate: Boolean get() = currency != "UAH" && uah == null
 }

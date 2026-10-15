@@ -68,6 +68,7 @@ class Ledger(
             fingerprint = fp,
             transferHint = p.transferHint,
             purchaseHint = p.purchaseHint,
+            uah = if (p.currency == "UAH") p.amount else null,
         )
         reconcile(tx)
         val paired = pairTransfer(tx)
@@ -85,7 +86,7 @@ class Ledger(
                 abs(it.amount - p.amount) < EPS && it.source != p.source &&
                 ((it.source == Bank.WALLET.display) != isWallet)
         }
-        val other = candidates.minByOrNull { abs(it.time - p.time) } ?: return null
+        val other = candidates.minByOrNull { abs(it.time - p.time) } ?: return mergeAcrossCurrencies(p, fp)
         // The wallet knows the shop; the bank knows the account and balance.
         val merchant = if (isWallet) p.merchant else other.merchant
         var merged = other.copy(
@@ -107,6 +108,59 @@ class Ledger(
         store.update(merged)
         return IngestResult.MERGED
     }
+
+    /**
+     * A Bybit card purchase in a Ukrainian shop: the shop charges hryvnias (Google Wallet
+     * shows ₴), Bybit reports the dollars it debited. Same purchase, two currencies.
+     * Keep the hryvnia amount the shop really charged and note the dollars.
+     */
+    private fun mergeAcrossCurrencies(p: ParsedTx, fp: String): IngestResult? {
+        val isWallet = p.source == Bank.WALLET.display
+        val other = store.inRange(p.time - MERGE_WINDOW, p.time + MERGE_WINDOW).filter {
+            it.origin == Origin.AUTO && it.direction < 0 && it.currency != p.currency &&
+                ((it.source == Bank.WALLET.display) != isWallet) &&
+                (merchantsAlike(it.merchant, p.merchant) || abs(it.time - p.time) <= 2 * 60 * 1000L)
+        }.minByOrNull { abs(it.time - p.time) } ?: return null
+
+        // Wallet side carries the local charge; the card side carries the foreign debit.
+        val walletAmount = if (isWallet) p.amount else other.amount
+        val walletCurrency = if (isWallet) p.currency else other.currency
+        val cardAmount = if (isWallet) other.amount else p.amount
+        val cardCurrency = if (isWallet) other.currency else p.currency
+        val cardSource = if (isWallet) other.source else p.source
+        val keepLocal = walletCurrency == "UAH"
+        val merchant = if (isWallet) p.merchant else other.merchant
+
+        var merged = other.copy(
+            amount = if (keepLocal) walletAmount else cardAmount,
+            currency = if (keepLocal) walletCurrency else cardCurrency,
+            uah = if (keepLocal) walletAmount else null,
+            merchant = merchant,
+            source = cardSource,
+            account = other.account ?: p.account,
+            time = minOf(other.time, p.time),
+            fingerprint = other.fingerprint + "|" + fp,
+            purchaseHint = true,
+            transferHint = false,
+            kind = Kind.SPEND,
+            note = "Списано с карты $cardSource: ${money(cardAmount, cardCurrency)}",
+        )
+        val category = Categorizer.categorize(merged.merchant, merged.kind, false, store.rules())
+        merged = merged.copy(category = category, review = category == Categories.OTHER)
+        store.update(merged)
+        return IngestResult.MERGED
+    }
+
+    private fun merchantsAlike(a: String, b: String): Boolean {
+        fun words(s: String) = Regex("\\p{L}{3,}").findAll(s.lowercase()).map { it.value }.toSet()
+        val wa = words(a)
+        return wa.isNotEmpty() && words(b).any { it in wa }
+    }
+
+    private fun money(v: Double, currency: String) =
+        "%.2f".format(java.util.Locale.ROOT, v).replace('.', ',') + " " + when (currency) {
+            "USD" -> "$"; "EUR" -> "€"; "UAH" -> "₴"; else -> currency
+        }
 
     /** Outgoing + incoming of the same amount within minutes = a move between own cards. */
     private fun pairTransfer(tx: Tx): Tx {

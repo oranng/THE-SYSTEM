@@ -10,6 +10,7 @@ enum class Bank(val display: String) {
     RAIF("Райффайзен"),
     PRIVAT("Приват24"),
     MONO("monobank"),
+    BYBIT("Bybit"),
     OTHER(""),
 }
 
@@ -20,6 +21,7 @@ object Banks {
         Bank.RAIF to Regex("(?iu)raif|райф|raiffeisen|aval"),
         Bank.PRIVAT to Regex("(?iu)privat|приват"),
         Bank.MONO to Regex("(?iu)monobank|ftband|^mono$"),
+        Bank.BYBIT to Regex("(?iu)bybit"),
     )
 
     fun detect(packageName: String, appLabel: String): Bank {
@@ -105,6 +107,7 @@ object Amounts {
  *  - MyRaif: title "5,00 ₴", "Visa Fishka Virtual *1534 поповнення картки від FUIB MoneyTransfer", "Баланс: 9,11 ₴"
  *  - Privat24: "+3.37₴ Зарахування з На подарунок", "-3.37₴ Переказ на свою картку *50…"
  *  - Google Кошелёк: merchant in the title, amount and card ("••4236") in the text
+ *  - Bybit Card: "Authorization of 4.88 USD at box express market was made on 2026-10-15 17:17:20."
  * Anything else falls back to a generic reading of amount, direction and merchant.
  */
 class NotificationParser(private val zone: ZoneId = ZoneId.systemDefault()) {
@@ -112,8 +115,12 @@ class NotificationParser(private val zone: ZoneId = ZoneId.systemDefault()) {
     private val balanceLine = Regex("(?iu)(доступно|доступний|баланс|залишок|остаток|available|balance|\\bbal\\b|кредитн)")
     private val accountLine = Regex("(?iu)^\\s*(рахунок|рахунку|счет|сч[её]т|картка|карта|card|account)\\b[^\\p{L}]*$|^\\s*(рахунок|счет|сч[её]т|card|account)\\s*:")
     private val dateRe = Regex("(\\d{2})[-./](\\d{2})[-./](\\d{4})[ ,T]+(\\d{1,2}):(\\d{2})")
+    /** ISO style "2026-10-15 17:17:20" (Bybit). The zone is not stated, see [parseIsoTime]. */
+    private val isoDateRe = Regex("(\\d{4})-(\\d{2})-(\\d{2})[ T](\\d{1,2}):(\\d{2})(?::(\\d{2}))?")
+    /** English card wording: "... at box express market was made on ..." */
+    private val atMerchantRe = Regex("(?iu)(?<![\\p{L}])at\\s+(.+?)(?:\\s+(?:was|were|has been|on\\s+\\d)|[.,;]?\\s*$)")
     private val maskRe = Regex("(?:\\*|•{1,2}|·{2}|\\.{2,3})\\s?(\\d{4})(?!\\d)")
-    private val ignoreRe = Regex("(?iu)(?<![\\p{L}])(код|code|пароль|password|otp|cvv)(?![\\p{L}])|відхилено|отклонен|declined|недостатньо коштів|недостаточно средств|insufficient")
+    private val ignoreRe = Regex("(?iu)(?<![\\p{L}])(код|code|пароль|password|otp|cvv)(?![\\p{L}])|відхилено|отклонен|declined|failed|unsuccessful|reversed|недостатньо коштів|недостаточно средств|insufficient")
 
     private val transferWords = listOf(
         "на свою картку", "на свою карту", "на свій рахунок", "на свой сч", "між своїми", "между своими",
@@ -125,12 +132,14 @@ class NotificationParser(private val zone: ZoneId = ZoneId.systemDefault()) {
     private val incomeWords = listOf(
         "зарахування", "поповнення", "надходження", "повернення", "кешбек", "кэшбэк", "cashback", "refund",
         "зачисление", "пополнение", "поступление", "возврат", "отримано", "отримання", "received", "income",
+        "credited", "deposit",
     )
     private val expenseWords = listOf(
         "списання", "списание", "покупка", "оплата", "оплачено", "платіж", "платеж", "зняття", "снятие",
         "переказ", "перевод", "payment", "purchase", "withdrawal", "комісія", "комиссия", "paid",
+        "authorization", "authorisation", "authorized", "charged", "debited", "spent",
     )
-    private val purchaseWords = listOf("покупка", "оплата", "оплачено", "payment", "purchase", "paid")
+    private val purchaseWords = listOf("покупка", "оплата", "оплачено", "payment", "purchase", "paid", "authorization", "authorisation")
 
     private val opPrefix = Regex(
         "(?iu)^(?:переказ на свою картку|переказ на свою карту|переказ на картку|переказ на карту|переказ з картки|" +
@@ -200,6 +209,7 @@ class NotificationParser(private val zone: ZoneId = ZoneId.systemDefault()) {
     }
 
     private fun parseTime(text: String, postTime: Long): Long {
+        isoDateRe.find(text)?.let { return parseIsoTime(it, postTime) }
         val m = dateRe.find(text) ?: return postTime
         val (d, mo, y, h, mi) = m.destructured
         return try {
@@ -212,7 +222,31 @@ class NotificationParser(private val zone: ZoneId = ZoneId.systemDefault()) {
         }
     }
 
+    /**
+     * Bybit writes "2026-10-15 17:17:20" without a zone. Read it both as local time and
+     * as UTC and keep whichever lands closer to when the notification arrived.
+     */
+    private fun parseIsoTime(m: MatchResult, postTime: Long): Long {
+        val (y, mo, d, h, mi) = m.destructured
+        val sec = m.groupValues[6].toIntOrNull() ?: 0
+        return try {
+            val ldt = LocalDateTime.of(y.toInt(), mo.toInt(), d.toInt(), h.toInt(), mi.toInt(), sec)
+            val local = ldt.atZone(zone).toInstant().toEpochMilli()
+            val utc = ldt.atZone(ZoneId.of("UTC")).toInstant().toEpochMilli()
+            val best = if (kotlin.math.abs(utc - postTime) < kotlin.math.abs(local - postTime)) utc else local
+            if (best > postTime + 60 * 60 * 1000L || best < postTime - 40L * 24 * 60 * 60 * 1000) postTime else best
+        } catch (e: Exception) {
+            postTime
+        }
+    }
+
     private fun merchant(bank: Bank, title: String, lines: List<String>, kind: Kind, source: String): String {
+        for (line in lines) {
+            atMerchantRe.find(line)?.let { m ->
+                val name = clean(m.groupValues[1])
+                if (name.count { it.isLetter() } >= 2) return name
+            }
+        }
         if (bank == Bank.WALLET && title.isNotBlank() && Amounts.find(title).isEmpty() &&
             !Regex("(?iu)wallet|кошел|гаманець|google").containsMatchIn(title)
         ) {

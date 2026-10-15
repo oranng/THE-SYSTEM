@@ -98,7 +98,7 @@ fun OperationsScreen(
             }
             byDay.forEach { (day, list) ->
                 item(key = "h$day") {
-                    val dayTotal = list.filter { it.kind == Kind.SPEND && it.currency == "UAH" }.sumOf { it.amount }
+                    val dayTotal = list.filter { it.kind == Kind.SPEND }.sumOf { it.uahValue ?: 0.0 }
                     Row(Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 6.dp)) {
                         Text(Fmt.dayTitle(day), color = Palette.dim, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f))
                         if (dayTotal > 0) Text("−" + Fmt.money(dayTotal), color = Palette.dim, fontSize = 13.sp)
@@ -166,10 +166,18 @@ fun TxRow(tx: Tx, onClick: () -> Unit) {
             Text(sub, color = Palette.dim, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
         Spacer(Modifier.width(8.dp))
-        Text(
-            Fmt.money(tx.signed, tx.currency, signed = true),
-            color = color, fontWeight = FontWeight.SemiBold,
-        )
+        Column(horizontalAlignment = Alignment.End) {
+            Text(
+                Fmt.money(tx.signed, tx.currency, signed = true),
+                color = color, fontWeight = FontWeight.SemiBold,
+            )
+            if (tx.currency != "UAH") {
+                Text(
+                    tx.uah?.let { "≈ " + Fmt.money(it * tx.direction, signed = true) } ?: "ждёт курса",
+                    color = if (tx.uah == null) Palette.warn else Palette.dim, fontSize = 11.sp,
+                )
+            }
+        }
     }
     Spacer(Modifier.height(6.dp))
 }

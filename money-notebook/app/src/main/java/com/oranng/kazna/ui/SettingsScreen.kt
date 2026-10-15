@@ -53,6 +53,7 @@ fun SettingsScreen(resumes: Int, version: Int) {
     val log = remember(version) { db.logEntries() }
     var showLog by remember { mutableStateOf(false) }
     var confirmWipe by remember { mutableStateOf(false) }
+    var widgetCfg by remember { mutableStateOf(WidgetPrefs.defaults(context)) }
 
     LazyColumn(
         Modifier.fillMaxSize().padding(horizontal = 16.dp),
@@ -87,6 +88,19 @@ fun SettingsScreen(resumes: Int, version: Int) {
                             context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${context.packageName}")))
                         }) { Text("О приложении", color = Palette.text) }
                     }
+                }
+            }
+        }
+
+        item {
+            Card {
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Label("Виджет")
+                    Text(
+                        "Применяется ко всем виджетам на экране. Отдельный виджет настраивается долгим нажатием → «Настроить».",
+                        color = Palette.dim, fontSize = 12.sp,
+                    )
+                    WidgetSettingsForm(widgetCfg) { widgetCfg = it; WidgetPrefs.saveAll(context, it); KaznaWidget.refresh(context) }
                 }
             }
         }
@@ -158,7 +172,7 @@ fun SettingsScreen(resumes: Int, version: Int) {
                 }
             }
         }
-        item { Text("Казна 1.1 · данные только на этом телефоне", color = Palette.dim, fontSize = 11.sp, modifier = Modifier.padding(bottom = 24.dp)) }
+        item { Text("Казна 1.2 · данные только на этом телефоне", color = Palette.dim, fontSize = 11.sp, modifier = Modifier.padding(bottom = 24.dp)) }
     }
 }
 
